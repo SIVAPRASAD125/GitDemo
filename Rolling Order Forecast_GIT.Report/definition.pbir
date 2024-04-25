@@ -1,0 +1,9 @@
+{
+  "version": "4.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../Rolling Order Forecast_GIT.SemanticModel"
+    },
+    "byConnection": null
+  }
+}

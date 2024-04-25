@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Rolling Order Forecast_GIT"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "cd1582f3-17fc-40bb-8cdc-781d1563ee8e"
+  }
+}
