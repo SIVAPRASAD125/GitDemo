@@ -71559,6 +71559,28 @@
               "BLANK())"
             ],
             "lineageTag": "7af1f00a-c938-4044-9a7e-a71248088bbd"
+          },
+          {
+            "name": "Actuals vs PW_Test",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Actuals & Forecast Measures",
+            "expression": [
+              "",
+              "VAR DisplayValue =",
+              "[VS Prior Wk Fcst_New]",
+              "Var Result = if([Sel Decimal]= \"w decimal\",CONVERT(DisplayValue,DOUBLE),",
+              "    if([Sel Decimal]= \"no decimal\",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),\"#,0\")))",
+              "Return",
+              "Result",
+              "",
+              ""
+            ],
+            "lineageTag": "82721ee7-d007-4324-8bba-4a661ba60774"
           }
         ],
         "partitions": [
