@@ -1,0 +1,128 @@
+table 'rpt flashbudget_OR'
+	lineageTag: ee13625f-391d-43d9-b0d9-084dc9488d32
+
+	column fiscalquarter
+		dataType: string
+		lineageTag: ecb4aaa2-5354-4855-921c-8b21796d47b6
+		summarizeBy: none
+		sourceColumn: fiscalquarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column geokey
+		dataType: string
+		lineageTag: 88451153-4487-4340-b116-abe2cd98f93f
+		summarizeBy: none
+		sourceColumn: geokey
+
+		annotation SummarizationSetBy = Automatic
+
+	column productkey
+		dataType: string
+		lineageTag: 7723416e-5077-44b5-9adc-1e330c5f6f2c
+		summarizeBy: none
+		sourceColumn: productkey
+
+		annotation SummarizationSetBy = Automatic
+
+	column salesmotion
+		dataType: string
+		lineageTag: c1e64983-aef7-4531-8970-06f7533051c8
+		summarizeBy: none
+		sourceColumn: salesmotion
+
+		annotation SummarizationSetBy = Automatic
+
+	column Target
+		dataType: string
+		lineageTag: 122e4f55-2b54-48f8-8310-1c1f00c81122
+		summarizeBy: none
+		sourceColumn: Target
+
+		annotation SummarizationSetBy = Automatic
+
+	column TargetType
+		dataType: string
+		lineageTag: 5d400012-d919-44a0-9d6b-a2cfd0c70868
+		summarizeBy: none
+		sourceColumn: TargetType
+
+		annotation SummarizationSetBy = Automatic
+
+	column GLHWFlag
+		dataType: string
+		lineageTag: 605ed8a7-8681-40f5-bb80-90e86975ff49
+		summarizeBy: none
+		sourceColumn: GLHWFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column GMSFlag
+		dataType: string
+		lineageTag: 56b31f77-e44a-4c21-a84f-fbe826d3a7c0
+		summarizeBy: none
+		sourceColumn: GMSFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: dbd70c58-1cd8-4953-9b32-b796a8e6249e
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Source
+		dataType: string
+		lineageTag: 9de0851e-ae53-4454-abbb-bd5c8713207a
+		summarizeBy: none
+		sourceColumn: Source
+
+		annotation SummarizationSetBy = Automatic
+
+	column GP_Key = 'rpt flashbudget_OR'[geokey]&"_"&'rpt flashbudget_OR'[ProductKey]&"_"&'rpt flashbudget_OR'[salesmotion]
+		dataType: string
+		lineageTag: e1940c6c-66dd-440f-8461-8ed822a598f7
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column RTM
+		dataType: string
+		lineageTag: 9126d171-e81c-491b-90cc-8be7414780b4
+		summarizeBy: none
+		sourceColumn: RTM
+
+		annotation SummarizationSetBy = Automatic
+
+	column ServiceSolution
+		dataType: string
+		lineageTag: 100be2b1-fa28-4cd1-9a63-a2ebb371592b
+		summarizeBy: none
+		sourceColumn: ServiceSolution
+
+		annotation SummarizationSetBy = Automatic
+
+	column GreenLakeFlag
+		dataType: string
+		lineageTag: 966c10f4-ec9e-46b6-bffb-c798f3b8a991
+		summarizeBy: none
+		sourceColumn: GreenLakeFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'rpt flashbudget_OR-e54488a3-75cd-4f0c-a462-45aadfbd5f5e' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    rpt_flashbudget_OR = Source{[Schema="rpt",Item="flashbudget_OR"]}[Data],
+				    #"Removed Columns" = Table.RemoveColumns(rpt_flashbudget_OR,{"CCflag", "ServiceType"})
+				in
+				    #"Removed Columns"
+

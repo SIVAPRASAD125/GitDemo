@@ -1,0 +1,23 @@
+table Table_TempSecurity
+	lineageTag: 5ade3637-0a37-4425-bda2-81c59d6e8fbc
+
+	column 'Prod Categ'
+		dataType: string
+		lineageTag: 3bf05ba3-2c6c-4a6d-a07b-9ddcd1171fc4
+		summarizeBy: none
+		sourceColumn: Prod Categ
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Table_TempSecurity = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("nZJPb4JAEMW/yoSTJh6MTbzTlRajpVQOmlAPWxiVSHfI/tH22xes1NIa2XDbnfzee5OZiWOH0XthNIK/BEYSnYHjhx6EklKTaFV+a+CntB7ETqRJ8u0NVQ00VA85fkBEudEZCQWXaMvUP/pLE93yI5SHLEFlmR7K7MDLIsvJpPZNM8k/wVtdFfghg1czHI7G4E5/dfbfYDWBnltQnhOMZrVmPOt3tw1IVBMsujssUGmgDTTh6/dgZdiEHiWimPM9Qq88s3O93lm/Y4SXVgfzUuLV62ziSvPGa+6ETVjwXbUB/Ttmg4UoFBcptbHPeocSomOmk10mtm34cu4GbUxEG33kp73c5p7u25AFlWNt6Wr9BQ==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Prod Categ" = _t, Security1Temp = _t, Security2Temp = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Prod Categ", type text}, {"Security1Temp", type text}, {"Security2Temp", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Security1Temp", "Security2Temp"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

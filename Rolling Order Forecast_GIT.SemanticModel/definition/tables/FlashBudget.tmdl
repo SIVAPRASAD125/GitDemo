@@ -1,0 +1,62 @@
+table FlashBudget
+	lineageTag: bc4d5059-1cfb-4425-bd41-ddc82aaec59b
+
+	column GeoKey
+		dataType: string
+		lineageTag: 416d1433-d4c6-46b9-83f3-bf420b3365ba
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 109747d8-4113-4687-9462-b39a81c321d1
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_5
+		dataType: string
+		lineageTag: d5581018-7db5-483d-a917-c7a2c2234280
+		summarizeBy: none
+		sourceColumn: Level_5
+
+		annotation SummarizationSetBy = Automatic
+
+	column Flash
+		dataType: double
+		lineageTag: 243b2e65-811c-4bbf-a232-a935dff3c5f5
+		summarizeBy: sum
+		sourceColumn: Flash
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Budget
+		dataType: double
+		lineageTag: 7010726a-8938-4af7-9cc7-b466702a27d1
+		summarizeBy: sum
+		sourceColumn: Budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition FlashBudget-f700cd7c-f574-469f-825a-f5aab5f43edc = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"ROF_FlashBudget_Sheet" = Source{[Schema="fact",Item="ROF_FlashBudget"]}[Data],
+				    #"Removed Other Columns" = Table.SelectColumns(ROF_FlashBudget_Sheet,{"FiscalQuarter", "CountryCode", "GeoKey", "Country", "BusinessAreaCode", "ProductKey", "Level_5", "Flash", "Budget"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Other Columns",{ {"FiscalQuarter", type text}, {"CountryCode", type text}, {"GeoKey", type text}, {"Country", type text}, {"BusinessAreaCode", type text}, {"ProductKey", type text}, {"Level_5", type text}, {"Flash", type number}, {"Budget", type number}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"BusinessAreaCode", "Country", "CountryCode", "FiscalQuarter"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

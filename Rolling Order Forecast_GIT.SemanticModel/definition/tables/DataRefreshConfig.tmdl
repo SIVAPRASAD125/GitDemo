@@ -1,0 +1,126 @@
+table DataRefreshConfig
+	lineageTag: ebda3dc9-b571-422a-a5d3-0e4de8e0c272
+
+	column DataSet
+		dataType: string
+		lineageTag: 0bf61d79-1193-470b-9ed9-1665c79a5e84
+		summarizeBy: none
+		sourceColumn: DataSet
+
+		annotation SummarizationSetBy = Automatic
+
+	column Source
+		dataType: string
+		lineageTag: 914340a9-e3c4-4465-a7eb-f789e082bc01
+		summarizeBy: none
+		sourceColumn: Source
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geo
+		dataType: string
+		lineageTag: 72b9480a-0d92-424b-908d-6b4e7976f230
+		summarizeBy: none
+		sourceColumn: Geo
+
+		annotation SummarizationSetBy = Automatic
+
+	column RefreshDate
+		dataType: dateTime
+		formatString: dd-mmm-yy h:nn:ss AM/PM
+		lineageTag: e1217d04-a6dd-49ac-b82e-f0149533b949
+		summarizeBy: none
+		sourceColumn: RefreshDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column RefreshTime
+		dataType: string
+		lineageTag: 5e79db66-cc6c-4a38-933a-7690b005cedf
+		summarizeBy: none
+		sourceColumn: RefreshTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column Comments
+		dataType: string
+		lineageTag: b6228c11-9307-41c0-bf40-e78e6ae493c4
+		summarizeBy: none
+		sourceColumn: Comments
+
+		annotation SummarizationSetBy = Automatic
+
+	column DisplayText = DataRefreshConfig[Source] & " " & DataRefreshConfig[DataSet] & " " & DataRefreshConfig[Geo] & " last refreshed on " & FORMAT( DataRefreshConfig[RefreshDate], "dd mmm, YYYY")
+		dataType: string
+		lineageTag: a07deecf-2e3d-4255-acc5-e89b7215cdcf
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataSetGroup
+		dataType: string
+		lineageTag: 4fdad988-fa60-44c7-b327-fea98c02d6b8
+		summarizeBy: none
+		sourceColumn: DataSetGroup
+
+		annotation SummarizationSetBy = Automatic
+
+	column Frequency
+		dataType: string
+		lineageTag: 2c9bb1e1-7905-4f1d-9049-f227b8b54b98
+		summarizeBy: none
+		sourceColumn: Frequency
+
+		annotation SummarizationSetBy = Automatic
+
+	column BU
+		dataType: string
+		lineageTag: f6e5051f-4c16-4e64-ac2a-b289999f6513
+		summarizeBy: none
+		sourceColumn: BU
+
+		annotation SummarizationSetBy = Automatic
+
+	column RefreshFlag
+		dataType: string
+		lineageTag: 7ba12610-e392-48c4-9280-17a73edcd14c
+		summarizeBy: none
+		sourceColumn: RefreshFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column Today = "Datasets refreshed on "& TODAY()
+		dataType: string
+		lineageTag: d3a7084f-6701-4a0c-9e4d-6dc9e2e64e85
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Refresh Date Copy' = DataRefreshConfig[RefreshDate]
+		dataType: dateTime
+		formatString: m/d/yyyy
+		lineageTag: 43ea33bb-db7c-4cc2-829a-c1199dd7b9cb
+		summarizeBy: none
+		isDataTypeInferred
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition DataRefreshConfig-6be3808b-3104-4930-894d-bc78f1ae3b4e = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"ROF_Geography_Sheet" = Source{[Schema="ref",Item="DataRefreshConfig"]}[Data]
+				in
+				    ROF_Geography_Sheet
+
+	annotation PBI_ResultType = Table
+

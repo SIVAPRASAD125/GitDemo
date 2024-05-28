@@ -1,0 +1,56 @@
+table 'dim GeoProduct'
+	lineageTag: 9cf691b8-8fe8-4855-b985-b5f94990192f
+
+	column GeoKey
+		dataType: string
+		lineageTag: 3abdd728-ea80-4bfd-99db-fbd7f40d122d
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 0b51a1ca-63f9-4231-b772-f6f73f8ff0fb
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales_Motion
+		dataType: string
+		lineageTag: 0eb7ef8a-82b1-48f9-a5f0-868989c156c9
+		summarizeBy: none
+		sourceColumn: Sales_Motion
+
+		annotation SummarizationSetBy = Automatic
+
+	column GP_Key = 'dim GeoProduct'[geokey]&"_"&'dim GeoProduct'[ProductKey]&"_"&'dim GeoProduct'[Sales_Motion]
+		dataType: string
+		lineageTag: ed6b3862-77d6-4f20-aab0-4a8284779f34
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales_Motion1 =
+			IF(RELATED('Prod Bridge'[Level_2_Description]) IN {"A&PS","Software"},RELATED('Prod Bridge'[GBUGroup4]),
+			IF(RELATED('Prod Bridge'[GBUGroup2])="GreenLake","HPE GreenLake",
+			
+			IF('dim GeoProduct'[Sales_Motion]="blank","Other",'dim GeoProduct'[sales_motion])))
+		dataType: string
+		lineageTag: 315758ae-64eb-47c5-8d6a-63f90f8a670a
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'dim GeoProduct-bf9e13ec-6532-4734-9197-83f14b9c82f9' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    dim_GeoProduct = Source{[Schema="dim",Item="GeoProduct"]}[Data]
+				in
+				    dim_GeoProduct
+

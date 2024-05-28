@@ -1,0 +1,99 @@
+role 'UAM Role'
+	modelPermission: read
+
+	tablePermission 'Prod Master' = ```
+			If ("Rolling Order Forecast" IN CALCULATETABLE(VALUES('UAM Attributes'[DATAVALUE]),FILTER (ALL ('UAM Attributes'),'UAM Attributes'[EmailAddress]=USERNAME() && 'UAM Attributes'[ATTRIBUTE]="Modules" && 'UAM Attributes'[DATAVALUE]="Rolling Order Forecast")),
+			
+			If(
+			MaxX(
+			Filter(
+			'UAM Attributes',
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME() && 'UAM Attributes'[ATTRIBUTE]="BU"
+			)
+			,'UAM Attributes'[DATAVALUE])<>"All BUs",
+			[SecurityBU1] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()&& 'UAM Attributes'[ATTRIBUTE]="BU"))
+			||
+			[SecurityBU2] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()&& 'UAM Attributes'[ATTRIBUTE]="BU"))
+			||
+			[SecurityBU3] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()&& 'UAM Attributes'[ATTRIBUTE]="BU"))
+			
+			||
+			[BU 3] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()&& 'UAM Attributes'[ATTRIBUTE]="BU"))
+			
+			,1=1))
+			
+			```
+
+	tablePermission 'Geo Master' =
+			If ("Rolling Order Forecast" IN CALCULATETABLE(VALUES('UAM Attributes'[DATAVALUE]),FILTER ( ALL ('UAM Attributes'),'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME() && 'UAM Attributes'[ATTRIBUTE]="Modules" && 'UAM Attributes'[DATAVALUE]="Rolling Order Forecast")),
+			
+			If(
+			MaxX(
+			Filter(
+			'UAM Attributes',
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()
+			&& 'UAM Attributes'[ATTRIBUTE]="Regions / Subregions"
+			)
+			,'UAM Attributes'[DATAVALUE])<>"All Geos",
+			
+			(
+			[Region] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()
+			&& 'UAM Attributes'[ATTRIBUTE]="Regions / Subregions"))
+			||
+			[SubRegion1] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()
+			&& 'UAM Attributes'[ATTRIBUTE]="Regions / Subregions"))
+			|| [SubRegion2] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()&& 'UAM Attributes'[ATTRIBUTE]="Regions / Subregions")
+			)
+			|| [SubRegion3] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()&& 'UAM Attributes'[ATTRIBUTE]="Regions / Subregions")
+			)
+			|| [Country] IN
+			CALCULATETABLE(
+			VALUES('UAM Attributes'[DATAVALUE]),
+			FILTER (
+			ALL ( 'UAM Attributes'),
+			'UAM Attributes'[EmailAddress]=USERPRINCIPALNAME()&& 'UAM Attributes'[ATTRIBUTE]="Regions / Subregions")
+			))
+			,1=1))
+
+	annotation PBI_Id = e0895e4cf18440e2bef459a817043e98
+

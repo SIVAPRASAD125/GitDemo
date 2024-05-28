@@ -1,0 +1,55 @@
+table 'QTD Plans'
+	lineageTag: aba80d1e-01c8-401b-afef-5d9183ae352d
+
+	measure Dynamic = ```
+			
+			SWITCH(
+			    TRUE(),    
+			MAX('QTD plans'[Column1])="Actuals" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Cum Orders],
+			MAX('QTD plans'[Column1])="Actualsn" && MAX(ColWkSorting[WKDyn]) <>"CurrWeek-1",BLANK(),
+			MAX('QTD plans'[Column1])="Monthly Plan" &&MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Cum M1_M2_M3],
+			MAX('QTD plans'[Column1])="Monthly Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK())
+			```
+		formatString: 0.0
+		lineageTag: 9c8785c8-5b8c-4876-a305-64b3fdf33a3c
+
+	column Column1
+		dataType: string
+		lineageTag: be2b6f36-353c-4c87-9781-9c43ac517c84
+		summarizeBy: none
+		sourceColumn: Column1
+		sortByColumn: Column2
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column2
+		dataType: int64
+		formatString: 0
+		lineageTag: 14edbe26-50ef-49f4-95cb-71a870f10b1e
+		summarizeBy: sum
+		sourceColumn: Column2
+
+		annotation SummarizationSetBy = Automatic
+
+	column Color = IF('QTD Plans'[Column1]="Actuals",1,2)
+		dataType: int64
+		formatString: 0
+		lineageTag: f4a4653e-ea5e-4116-8009-b773c1d7a4b5
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'QTD Plans' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WckwuKU3MKVbSUTJUitWJVgIyjMAM3/y8koycSoWAnMQ8oKCxUmwsAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t, Column2 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

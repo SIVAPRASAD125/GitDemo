@@ -1,0 +1,99 @@
+table Pipeline_Services
+	lineageTag: 01cbebd1-3fcd-4fba-8aa7-f41f152f1dd4
+
+	column FiscalWeekKey
+		dataType: string
+		lineageTag: e217dde1-2619-4055-9f92-b8a9beb573dc
+		summarizeBy: none
+		sourceColumn: FiscalWeekKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: 80846fbb-2cc6-4a0a-862d-74eb68644b97
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: f77634ad-2a40-4527-8264-667ac57d536b
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ForecastCategory
+		dataType: string
+		lineageTag: 4bb9a946-b9db-440e-9a30-89e68831c7b7
+		summarizeBy: none
+		sourceColumn: ForecastCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesStage
+		dataType: string
+		lineageTag: a71e5456-9241-4d71-9805-3f6e5f46f4b8
+		summarizeBy: none
+		sourceColumn: SalesStage
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 757770bf-9224-4d74-8010-413ced9c6b30
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column DealBased_In/Out
+		dataType: string
+		lineageTag: 9e623196-694e-495f-b136-0d22d11bd77e
+		summarizeBy: none
+		sourceColumn: DealBased_In/Out
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesMotion
+		dataType: string
+		lineageTag: df5d9c35-bb4e-4cb0-b6fe-1b10c7238c90
+		summarizeBy: none
+		sourceColumn: SalesMotion
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: db8a8134-780a-44ca-b902-995a1a76ba90
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column GP_Key = 'Pipeline_Services'[geokey]&"_"&'Pipeline_Services'[ProductKey]&"_"&'Pipeline_Services'[SalesMotion]
+		dataType: string
+		lineageTag: f2b6358c-9a0b-4a81-8cf3-6c4afd3bcdfb
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Pipeline_Services-a35cc1d3-1b94-45ca-87d8-2ca856392351 = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    fact_Pipeline_Services = Source{[Schema="fact",Item="Pipeline_Services"]}[Data],
+				    #"Replaced Value" = Table.ReplaceValue(fact_Pipeline_Services,"W14","W13-1",Replacer.ReplaceText,{"WeekNo"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Replaced Value",{"Country", "Strategic Deal Exec Sponsor", "Strategic Deal Review"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

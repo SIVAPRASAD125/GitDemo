@@ -1,0 +1,391 @@
+relationship 50818cfd-947a-40b7-85c9-4412b0c5764a
+	fromColumn: 'ROF Forecast'.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship d5e56432-bea2-48d6-8c8e-ea00d8a551db
+	fromColumn: 'ROF OrderPlan'.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 9c64b879-879e-412d-81eb-6d1cd00bc7ff
+	fromColumn: 'Non Executable'.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 0904678a-c2eb-43bf-bf18-523379a3da64
+	fromColumn: 'ROF BudgetPlan'.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 0ea3bf8e-fb0c-4c3f-ba16-59e8959828f5
+	fromColumn: 'ROF Forecast'.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship fa5725a4-910a-44ad-b7b9-364cd1673ac3
+	fromColumn: 'ROF OrderPlan'.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship 78f8b18c-d59a-433e-a95e-92b4f8114758
+	fromColumn: 'Non Executable'.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship 8ff0e179-e59e-4e38-9f36-9861eb8647e5
+	fromColumn: FlashBudget.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship 29ff5bd8-8b15-4d49-b59c-7a5f36453421
+	fromColumn: EOP.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship f649d709-7907-4d84-8f5a-1fc74a619a9b
+	fromColumn: 'ROF BudgetPlan'.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship e1d5da02-0861-4662-8153-dc59c31f832c
+	fromColumn: EOP.WeekNo
+	toColumn: ColWkSorting.Weeks
+
+relationship 97137a70-e6e6-440b-8ce6-3355d26a25cb
+	fromColumn: 'ROF Forecast'.ColumnWeek
+	toColumn: ColWkSorting.Weeks
+
+relationship 4b5de6db-333f-4a16-afd7-d7ce0c3edc89
+	fromColumn: 'Non Executable'.Weekno
+	toColumn: ColWkSorting.Weeks
+
+relationship de6e207a-14da-4b52-9a51-1ecd33db61fd
+	fromColumn: 'ROF OrderPlan'.WeekNo
+	toColumn: ColWkSorting.Weeks
+
+relationship ce1727fb-e127-4e22-aa48-1e10c8783573
+	fromColumn: 'ROF BudgetPlan'.WeekNo
+	toColumn: ColWkSorting.Weeks
+
+relationship f2a89d3e-c954-4a0d-acf3-30ef55c7bdbd
+	fromColumn: 'ROF Forecast'.WeekNo
+	toColumn: RowWkSorting.Week
+
+relationship 53046a5b-98f4-44ce-a64e-c3b4d5f97c64
+	fromColumn: Pipeline.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship 9a7ff38d-1e26-4399-8a82-e5f74072dde8
+	fromColumn: FlashBudget.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 6c463a26-952c-4155-bfdb-6bf0d2707620
+	fromColumn: Pipeline.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 10b9b208-50b9-4d42-bd64-948dcea8f374
+	fromColumn: 'ROF Pipeline'.ROFGeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 84a2daef-1a45-4a73-9213-f0441f570615
+	fromColumn: 'ROF Pipeline'.ROFProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship 51ce03de-8122-481f-b4f9-cdb29ea26d83
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Dummy Table'.Value
+	toColumn: ColWkSorting.Weeks
+
+relationship 97b5a02b-3590-409e-adff-388e5aa807bd
+	fromColumn: EOP.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship f92d0de2-49a9-47ed-8b66-0511326eec5f
+	fromColumn: 'Geo Bridge'.ROFGeoKEY
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 4b287a4b-2e66-452f-a675-4a27ee9753aa
+	fromColumn: 'Prod Bridge'.ROFProductKEY
+	toColumn: 'Prod Master'.ProductKey
+
+relationship 9f7b7c1f-6344-4e11-9a04-7668aae8945e
+	fromColumn: 'ROF OrderPlan'.Plan
+	toColumn: 'Month new'.Plan
+
+relationship d9f3c6f4-7722-43f1-a407-ab1e2336c14c
+	fromColumn: ROF_Clari_Final_Split.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship 3d80120b-4d5e-4365-b521-e6a85cdbd0cb
+	fromColumn: ROF_Clari_Final_Split.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship a6b34acc-035b-4657-a894-291895bd4d25
+	fromColumn: ROF_Clari_Final_Split.ColumnWeek
+	toColumn: ColWkSorting.Weeks
+
+relationship dc7dfef9-2ff1-40f7-8d4c-cfbfea374f05
+	fromColumn: ROF_Clari_Final_Split.WeekNo
+	toColumn: RowWkSorting.Week
+
+relationship c496ffa3-7a00-4fcb-a928-ec2dc257fd54
+	fromColumn: Pipeline.WeekNo
+	toColumn: ColWkSorting.Weeks
+
+relationship 525ce4fe-ce86-4d30-a5a5-335f67a50046
+	fromColumn: 'dim GeoProduct'.ProductKey
+	toColumn: 'Prod Bridge'.ProductKey
+
+relationship a967b787-8bfb-45d0-92e3-54a75c2c8c2b
+	fromColumn: 'dim GeoProduct'.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship d2f727ff-53df-44b8-a24f-310e3ff8d8db
+	toCardinality: many
+	fromColumn: 'rpt flashbudget_OR'.fiscalquarter
+	toColumn: Date.fiscalyrQtr
+
+relationship d4397b63-f33e-4409-9743-4bdf8a106657
+	fromColumn: 'Load Bookings'.fiscalweekkey
+	toColumn: Date.fiscal_weekkey
+
+relationship 3192ac4f-add1-4fda-99f5-afddd05929a2
+	fromColumn: Pipeline_Services.GP_Key
+	toColumn: 'dim GeoProduct'.GP_Key
+
+relationship 3694b64c-9e36-4d4a-8d4c-a3fe0b3550ea
+	fromColumn: 'Load Bookings'.GP_Key
+	toColumn: 'dim GeoProduct'.GP_Key
+
+relationship 07ce4f04-1f3e-4b3f-8e64-4434f7209ca0
+	fromColumn: 'rpt flashbudget_OR'.GP_Key
+	toColumn: 'dim GeoProduct'.GP_Key
+
+relationship 40a004bf-8bec-4cbf-a13e-0144263c91fd
+	fromColumn: Pipeline_Services.WeekNo
+	toColumn: ColWkSorting.Weeks
+
+relationship cc18d9c9-edf9-48b3-a654-a34d9b01a242
+	fromColumn: ROF_NEO.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+
+relationship 6ed7a9b3-ac39-456e-9c42-b75822a1a69c
+	fromColumn: ROF_NEO.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship d04b1910-8be1-4f8e-b2f2-3b2a279de6fe
+	fromColumn: ROF_NEO.WeekNo
+	toColumn: ColWkSorting.Weeks
+
+relationship 1df639fd-0f6d-4ba1-b75e-b7c4d11ef577
+	fromColumn: 'ROF Pipeline'.'Forecast Category'
+	toColumn: 'Sort Forecast Category'.'Fcst Category'
+
+relationship 1238f4ec-a88b-c7e3-0c81-7ef52d340a74
+	fromColumn: 'ROF Pipeline'.WeekNo
+	toColumn: ColWkSorting.Weeks
+
+relationship 2ea47660-72a0-47e6-a22c-30e3a59d7024
+	crossFilteringBehavior: bothDirections
+	securityFilteringBehavior: bothDirections
+	fromColumn: 'Geo Master'.SubRegion1
+	toColumn: 'Geo Master Sorting'.SubRegion1
+
+relationship 2c17ef13-b166-4c3a-942a-500bc48c6ebb
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Table_TempSecurity.'Prod Categ'
+	toColumn: 'Prod Master'.'Prod Categ'
+
+relationship ec1992dd-1cdf-41f8-96e5-6037928d2b59
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Prod Master Sorting (Prod categ)'.'Prod Categ'
+	toColumn: 'Prod Master'.'Prod Categ'
+
+relationship f3669a16-90f6-4622-b0d6-06dd5d6b6054
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'Prod Master'.'BU 2'
+	toColumn: 'Prod Master Sorting (BU)'.'BU 2'
+
+relationship 4148eb55-8fa0-471a-9cc6-d7ae068f03a4
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'Prod Master'.'BU 1'
+	toColumn: 'Prod Master Sorting (Alternate BU)'.'Alternate BU'
+
+relationship 68276482-409f-41e5-b971-ec56a80884d5
+	isActive: false
+	fromColumn: 'Prod Master'.Sort
+	toColumn: 'Geo Master Sorting'.Sort
+
+relationship 7fa8d3c2-1039-4e9e-87cf-6a8c4186067e
+	fromColumn: 'Load Bookings'.weekno
+	toColumn: ColWkSorting.Weeks
+
+relationship 8fb44079-b51c-4f32-975a-436e58ec4272
+	fromColumn: OrdersDetailed.ProductKey
+	toColumn: 'Prod Bridge'.ProductKey
+
+relationship 5445d1d8-d018-409c-b07d-697fb75420e9
+	fromColumn: OrdersDetailed.Geokey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 61859cb0-0e54-4f94-8660-1d3b6f386855
+	fromColumn: OrdersDetailed.'Week No New'
+	toColumn: ColWkSorting.Weeks
+
+relationship 952311c3-a0a0-4663-ab07-df3aebd6cf1a
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Calcs.Column1
+	toColumn: 'QTD Plans'.Column1
+
+relationship 1022a01b-718a-4566-839a-0c0a27f0a045
+	fromColumn: 'fact ROF_Actuals_PQ'.ProductKey
+	toColumn: 'Prod Master'.ProductKey
+
+relationship f89a36d4-cc8f-4517-a978-890399b5187d
+	isActive: false
+	fromColumn: 'ROF Forecast'.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship f7311d02-b3ea-4f17-a6e3-54c9f1be96b8
+	isActive: false
+	fromColumn: 'ROF OrderPlan'.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 4acae0f0-4b4d-4b4b-a10d-24e6de3314d8
+	isActive: false
+	fromColumn: 'Non Executable'.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 666e8f09-5437-45e9-b7bf-a0015b3263ac
+	isActive: false
+	fromColumn: Pipeline.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship a9d2ce75-650a-451b-a82f-3191942c0948
+	isActive: false
+	fromColumn: FlashBudget.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship fc7bfbcb-9eed-4d73-a012-8518ceb36458
+	isActive: false
+	fromColumn: EOP.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship fb47ac3b-2622-4e1b-8238-bfd9b7720fc6
+	isActive: false
+	fromColumn: 'ROF BudgetPlan'.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship d790e986-e4ab-4306-a4ce-728543ee1faf
+	isActive: false
+	fromColumn: 'Load Bookings'.geokey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 8c1fd842-3bb9-4770-822e-f00fd3c1ec11
+	isActive: false
+	fromColumn: ROF_Clari_Final_Split.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 3e259276-766d-4bf9-ab42-bfea96b4bffc
+	isActive: false
+	fromColumn: 'rpt flashbudget_OR'.geokey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 298454af-3c27-4781-ac89-40701e801e52
+	isActive: false
+	fromColumn: Pipeline_Services.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 478d7d46-92bd-4b52-8f0c-df404126f1b8
+	isActive: false
+	fromColumn: ROF_NEO.GeoKey
+	toColumn: 'Geo Bridge'.GeoKey
+
+relationship 58cba29f-ea63-4722-a6c4-0d699aa3e457
+	isActive: false
+	fromColumn: 'Load Bookings'.productkey
+	toColumn: 'Prod Bridge'.ProductKey
+
+relationship be42b00f-52d3-4fd1-950a-717f980b93cf
+	isActive: false
+	fromColumn: 'rpt flashbudget_OR'.productkey
+	toColumn: 'Prod Bridge'.ProductKey
+
+relationship 2b82d809-7b63-4998-b3fa-9350dc7196d5
+	isActive: false
+	fromColumn: Pipeline_Services.ProductKey
+	toColumn: 'Prod Bridge'.ProductKey
+
+relationship 38b7e5bf-ec20-4942-aa40-ccf85042d04e
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: RowWkSorting.SortOrder
+	toColumn: ColWkSorting.SortOrder
+
+relationship a354d555-c707-4c9e-8c9c-c3fdf644da9d
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Sort Forecast Category'.'Sort Order'
+	toColumn: ColWkSorting.SortOrder
+
+relationship 34f66312-4c21-4894-bede-0f892fd3a810
+	isActive: false
+	fromColumn: 'Geo Bridge'.SubRegion1
+	toColumn: 'Geo Master Sorting'.SubRegion1
+
+relationship 366669e8-36e2-488c-8fa5-1ec3d1186267
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Prod Master Sorting (Prod categ)'.'Prod Categ'
+	toColumn: Table_TempSecurity.'Prod Categ'
+
+relationship 818211ef-dc8c-4f5a-8973-4a8058465f68
+	isActive: false
+	fromColumn: 'Prod Bridge'.Sort
+	toColumn: 'Prod Master Sorting (Prod categ)'.Sort
+
+relationship 24eef508-9c04-4780-ba58-1d54470add13
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Geo Master Sorting'.Sort
+	toColumn: 'Prod Master Sorting (Prod categ)'.Sort
+
+relationship a3fee7e6-9772-4f46-b1b2-60edd6414040
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Prod Master Sorting (BU)'.Sort
+	toColumn: 'Prod Master Sorting (Prod categ)'.Sort
+
+relationship 587c560b-344e-4321-9515-bee452253cc3
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Prod Master Sorting (Alternate BU)'.Sort
+	toColumn: 'Prod Master Sorting (Prod categ)'.Sort
+
+relationship bffb906e-f751-4b33-bb50-f8eab6f95f33
+	fromColumn: Pipeline_Services.FiscalWeekKey
+	toColumn: Date.fiscal_weekkey
+
+relationship 7b1bba22-75b6-440c-81bc-4513606823ac
+	isActive: false
+	fromColumn: 'Non Executable'.BU
+	toColumn: 'Prod Master Sorting (BU)'.'BU 2'
+
+relationship 7b767372-7c8e-48a5-9d6c-6fbe18667356
+	isActive: false
+	fromColumn: 'ROF BudgetPlan'.BU
+	toColumn: 'Prod Master Sorting (BU)'.'BU 2'
+
+relationship 9ea958d6-66a2-43fc-8413-ecd3a04b165e
+	fromColumn: 'fact ROF_Actuals_PQ'.WeekNo
+	toColumn: RowWkSorting.Week
+
+relationship 971e21a7-ac51-4e14-9f4d-15b5256f6a95
+	fromColumn: 'fact ROF_Actuals_PQ'.ColumnWeek
+	toColumn: ColWkSorting.Weeks
+
+relationship 2ec88198-adcd-42d1-b907-eb8a23ca5c17
+	fromColumn: 'fact ROF_Actuals_PQ'.GeoKey
+	toColumn: 'Geo Master'.GeoKey
+

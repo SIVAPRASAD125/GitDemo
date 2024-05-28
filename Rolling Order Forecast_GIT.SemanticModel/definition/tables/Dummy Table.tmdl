@@ -1,0 +1,22 @@
+table 'Dummy Table'
+	lineageTag: fb584145-54b2-4cb8-a43f-63f7c9ae0b20
+
+	column Value
+		dataType: int64
+		formatString: 0
+		lineageTag: 0ec98778-45f4-421b-9479-d6fb5bacf7b2
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dummy Table-77ac7a45-6bfc-4d0e-b554-b27b3384dac0' = calculated
+		mode: import
+		source =
+				
+				{1}
+
+	annotation PBI_Id = 94407b63145341ceaf2f1a58ed0df864
+

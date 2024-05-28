@@ -1,0 +1,188 @@
+table 'fact ROF_Actuals_PQ'
+	lineageTag: 3ebfa857-83a8-4b34-b92b-2d3bd6cec1af
+
+	measure Orders_PQ = ```
+			
+			VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR DisplayValue = 
+			    CALCULATE(
+			        [Forecast Value_PQ],
+			        KEEPFILTERS(RowWkSorting[Week] = "W13 + 1"))
+			        //*KEEPFILTERS(ColWkSorting[Open/Close] = "Close" || ColWkSorting[IsCurrentWeek]="True" && VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y"),
+			        //*KEEPFILTERS('ROF Forecast'[Clari/ROF] = "ROF")//*
+			
+			    
+			  VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            Result
+			        ),
+			        Result
+			    )
+			```
+		lineageTag: 4d525e31-e738-4d48-94f0-5fcd2a4b9f1f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Forecast Value_PQ' =
+			
+			VAR DisplayValue =
+			SUMX(
+			    SUMMARIZE(
+			        'fact ROF_Actuals_PQ',
+			        'fact ROF_Actuals_PQ'[GeoKey],
+			        'fact ROF_Actuals_PQ'[ProductKey],
+			        ColWkSorting[SortOrder],
+			        ColWkSorting[Weeks],
+			        RowWkSorting[Week],
+			        RowWkSorting[SortOrder],
+			        'fact ROF_Actuals_PQ'[Value]
+			    ),
+			    'fact ROF_Actuals_PQ'[Value]
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		lineageTag: 0ea00e39-5a62-4f1b-9420-d78dcb79eb97
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure PQ = CALCULATE('fact ROF_Actuals_PQ'[Forecast Value_PQ],FILTER('fact ROF_Actuals_PQ','fact ROF_Actuals_PQ'[Clari/ROF]="ROF"))
+		lineageTag: 6a2ace9e-9dee-4e90-a3ba-47eaae59db2b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Cum orders_pq' =
+			
+			CALCULATE(
+			    [Orders_PQ],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: 0.0
+		lineageTag: fca598a2-9235-421b-ab88-97115d7ba7b7
+
+	column FiscalQuarter
+		dataType: string
+		lineageTag: e313ac77-bdd9-4277-9512-93f45329f100
+		summarizeBy: none
+		sourceColumn: FiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: f0b39d13-142a-4a9f-a419-94e28973e0db
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geography
+		dataType: string
+		lineageTag: 8822d1a0-738d-4e4c-8a1a-f73899865082
+		summarizeBy: none
+		sourceColumn: Geography
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 46c6e415-1cdb-43d7-9713-03224c4400a2
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column BackLog
+		dataType: double
+		lineageTag: ef6ebcf1-86d6-4387-a523-c778d7ca5086
+		summarizeBy: sum
+		sourceColumn: BackLog
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column execBacklog
+		dataType: double
+		lineageTag: c31ca40f-20d9-47f0-9d30-81b1effdef00
+		summarizeBy: sum
+		sourceColumn: execBacklog
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column GeoKey
+		dataType: string
+		lineageTag: 30a05cf1-81bb-464d-8032-2d249cfadc79
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: f366857a-1b44-423e-b18e-a665d0d93f85
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clari/ROF
+		dataType: string
+		lineageTag: b9dacf20-53c1-47b7-8f56-980acfe91ea5
+		summarizeBy: none
+		sourceColumn: Clari/ROF
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		formatString: 0.0
+		lineageTag: eaf97bf5-69fe-468d-8148-407cfd86059f
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column ColumnWeek
+		dataType: string
+		lineageTag: b5a692cb-ea81-43db-9bba-902b11dcfffa
+		summarizeBy: none
+		sourceColumn: ColumnWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'fact ROF_Actuals_PQ' = m
+		mode: import
+		source = ```
+				let
+				    Source = Sql.Databases("sqldb0050prd.americas.hpqcorp.net,1190"),
+				    Sales_Cockpit = Source{[Name="Sales_Cockpit"]}[Data],
+				    fact_ROF_Actuals_PQ = Sales_Cockpit{[Schema="fact",Item="ROF_Actuals_PQ"]}[Data],    
+				    #"Removed Columns" = Table.RemoveColumns(#"fact_ROF_Actuals_PQ",{"CountryCode", "BusinessAreaCode", "Geo", "budget",  "id", "UpdatedBy", "UpdatedTime", "Total"}),
+				    #"Added Custom" = Table.AddColumn(#"Removed Columns", "Clari/ROF", each "ROF"),
+				    #"Unpivoted Other Columns" = Table.UnpivotOtherColumns(#"Added Custom", {"Clari/ROF", "GeoKey", "ProductKey", "FiscalQuarter", "Region", "Geography", "BU", "WeekNo", "BackLog","execBacklog"}, "Attribute", "Value"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Unpivoted Other Columns",{{"Attribute", "ColumnWeek"}}),
+				     #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"FiscalQuarter", type text}, {"Region", type text}, {"BU", type text}, {"WeekNo", type text}, {"GeoKey", type text}, {"ProductKey", type text}, {"ColumnWeek", type text}, {"Value", type number}, {"BackLog", type number}, {"execBacklog", type number}}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type",{"BU"})
+				in
+				    #"Removed Columns1"
+				```
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,73 @@
+table 'Metric Definitions'
+	lineageTag: e05520bd-04b7-42d9-97c9-b74c9bd16372
+
+	column Dashboard
+		dataType: string
+		lineageTag: da18e85e-5674-4b76-a548-8eea1e94291c
+		summarizeBy: none
+		sourceColumn: Dashboard
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 41ee581f-3ccc-4397-96ee-6e392e9909d2
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Metric
+		dataType: string
+		lineageTag: ae9389ec-c740-449d-adb9-2fd87399e9b3
+		summarizeBy: none
+		sourceColumn: Metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column Definition
+		dataType: string
+		lineageTag: 0d9f4bd8-6cc3-486d-addb-1e09bda92bf5
+		summarizeBy: none
+		sourceColumn: Definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Available in Page'
+		dataType: string
+		lineageTag: edc62580-658c-48d8-a9e5-0396ed77e675
+		summarizeBy: none
+		sourceColumn: Available in Page
+
+		annotation SummarizationSetBy = Automatic
+
+	column Page
+		dataType: string
+		lineageTag: 8d492809-7350-4f95-b23e-7f1c23f0a153
+		summarizeBy: none
+		sourceColumn: Page
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: string
+		lineageTag: 2d1cebd3-6246-49cd-ba05-21d94fcf387f
+		summarizeBy: none
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Metric Definitions-676e8c1e-5103-47f2-afbb-e468cf1aa56d' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents("https://hpe.sharepoint.com/sites/msteams_ac908f/Shared%20Documents/Project%20Phases/Deploy/Training%20material/MetricDefinitions.xlsx"), null, true),
+				    Table_metrics_Table = Source{[Item="Table_metrics",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(Table_metrics_Table,{{"Dashboard", type text}, {"Category", type text}, {"Metric", type text}, {"Definition", type text}, {"Available in Page", type text}, {"Pipeline Coverage HW", type text}, {"Pipeline Coverage Services", type text}, {"Waterfall HW", type text}, {"Waterfall Services", type text}, {"Accelerate the Quarter", type text}, {"Order Details", type text}, {"ROF Executive", type text}, {"ROF Detailed", type text}, {"ROF Mobile", type text}}),
+				    #"Unpivoted Other Columns" = Table.UnpivotOtherColumns(#"Changed Type", {"Available in Page", "Dashboard", "Category", "Metric", "Definition"}, "Attribute", "Value"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Unpivoted Other Columns",{{"Attribute", "Page"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+

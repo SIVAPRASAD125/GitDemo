@@ -1,0 +1,138 @@
+perspective 'Custom Report'
+
+	perspectiveTable 'Geo Master'
+
+		perspectiveColumn Region
+
+		perspectiveColumn SubRegion1
+
+		perspectiveColumn SubRegion2
+
+		perspectiveColumn SubRegion3
+
+		perspectiveColumn Country
+
+		perspectiveColumn RegionMoBo
+
+	perspectiveTable ColWkSorting
+
+		perspectiveColumn Weeks
+
+	perspectiveTable 'Prod Master'
+
+		perspectiveColumn 'BU 1'
+
+		perspectiveColumn 'BU 2'
+
+		perspectiveColumn 'BU 3'
+
+		perspectiveColumn 'BU 4'
+
+		perspectiveColumn 'Prod Categ'
+
+	perspectiveTable Calcs
+
+		perspectiveMeasure BBL
+
+		perspectiveMeasure EBBL
+
+		perspectiveMeasure 'Non Exec Cum'
+
+		perspectiveMeasure 'Non Exec Total'
+
+		perspectiveMeasure 'vs Order Budget Plan'
+
+		perspectiveMeasure 'vs Order Budget Plan Cum'
+
+		perspectiveMeasure 'vs Plan_M1'
+
+		perspectiveMeasure 'vs Week Forecast'
+
+		perspectiveMeasure 'vs Rev Flash'
+
+		perspectiveMeasure 'vs Rev Budget'
+
+		perspectiveMeasure 'vs Flash w/o BBL'
+
+		perspectiveMeasure 'vs Plan_M2'
+
+		perspectiveMeasure 'vs Plan Cum_M1'
+
+		perspectiveMeasure 'vs Plan Cum_M2'
+
+		perspectiveMeasure 'vs Plan_M3'
+
+		perspectiveMeasure 'vs Plan Cum_M3'
+
+		perspectiveMeasure Commit
+
+		perspectiveMeasure 'Late Stage (SS 4-5)'
+
+		perspectiveMeasure 'Total C + U + LS'
+
+		perspectiveMeasure Upside
+
+		perspectiveMeasure Won
+
+		perspectiveMeasure 'Total Funnel'
+
+		perspectiveMeasure 'Early Stage (SS 1-3)'
+
+		perspectiveMeasure 'Order Budget Plan'
+
+		perspectiveMeasure 'M1 EOP Value'
+
+		perspectiveMeasure 'Revenue Flash'
+
+		perspectiveMeasure 'Revenue Budget'
+
+		perspectiveMeasure 'M1 Order Plan+Task'
+
+		perspectiveMeasure 'M2 Order Plan+Task'
+
+		perspectiveMeasure 'M3 Order Plan+Task'
+
+		perspectiveMeasure 'M2 EOP Value'
+
+		perspectiveMeasure 'M3 EOP Value'
+
+		perspectiveMeasure 'Deal Based Indirect'
+
+		perspectiveMeasure 'Total Judgement'
+
+		perspectiveMeasure 'Deal Based Direct'
+
+		perspectiveMeasure 'Deal Based'
+
+		perspectiveMeasure 'Judge Down (Non Deal)'
+
+		perspectiveMeasure 'Run Rate (Non Deal)'
+
+		perspectiveMeasure 'Stretch (Non Deal)'
+
+		perspectiveMeasure 'Task (Non Deal)'
+
+		perspectiveMeasure 'Non Deal Based'
+
+		perspectiveMeasure 'vs Prior Wk Fcst (ROF)'
+
+		perspectiveMeasure 'Cum M1 Order Plan + Task'
+
+		perspectiveMeasure 'Cum M2 Order Plan + Task'
+
+		perspectiveMeasure 'Cum M3 Order Plan + Task'
+
+		perspectiveMeasure 'vs Order Plan Cum'
+
+		perspectiveMeasure Orders
+
+		perspectiveMeasure 'Cum Orders'
+
+		perspectiveMeasure 'Curr Wk Forecast ROF'
+
+		perspectiveMeasure 'Cum Orders + Forecast (ROF)'
+
+	perspectiveTable RowWkSorting
+
+		perspectiveColumn Week
+

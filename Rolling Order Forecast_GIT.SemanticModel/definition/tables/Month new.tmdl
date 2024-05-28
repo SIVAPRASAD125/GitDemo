@@ -1,0 +1,34 @@
+table 'Month new'
+	lineageTag: bb5a67f5-923c-4b98-af17-48533d15c405
+
+	column Plan
+		dataType: string
+		lineageTag: c6c2d944-940e-483f-8f97-f3c0805c6d11
+		summarizeBy: none
+		sourceColumn: Plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: f1d797ea-dd46-427b-a322-95c8afbac588
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Month new-ee8369b2-e4b6-4ada-a97f-2426518fb563' = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = #"ROF OrderPlan",
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"Plan"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Inserted Text Before Delimiter" = Table.AddColumn(#"Removed Duplicates", "Text Before Delimiter", each Text.BeforeDelimiter([Plan], "-"), type text),
+				    #"Renamed Columns" = Table.RenameColumns(#"Inserted Text Before Delimiter",{{"Text Before Delimiter", "Month"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+

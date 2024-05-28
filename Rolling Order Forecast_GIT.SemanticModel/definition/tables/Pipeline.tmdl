@@ -1,0 +1,69 @@
+table Pipeline
+	lineageTag: 1e41dd25-acbb-4e1f-ba64-ea90ba7a9d32
+
+	column ForecastCategory
+		dataType: string
+		lineageTag: 4d0b5fe3-6e29-4b26-90b7-e174fc06766e
+		summarizeBy: none
+		sourceColumn: ForecastCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalesStage
+		dataType: string
+		lineageTag: 77ecd9f1-c6d2-4f77-ae9a-23f4507be998
+		summarizeBy: none
+		sourceColumn: SalesStage
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: double
+		lineageTag: 08a872a1-930a-4e8d-a158-f09b4d8962ea
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column GeoKey
+		dataType: string
+		lineageTag: 4d0f800a-5e14-4a64-aedc-1ae9a943e8bc
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 1cbd4b6b-ba4c-4d75-9cff-a5dac97096b7
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 3d59f07f-300f-4940-bab8-bac3cce42fbb
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Pipeline-e2d9dbad-3bb2-470d-b639-5bf78e01ef03 = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"fact ROF_Pipeline_Sheet" = Source{[Schema="fact",Item="ROF_Pipeline"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(#"fact ROF_Pipeline_Sheet",{{"Country", type text}, {"ForecastCategory", type text}, {"SalesStage", type text}, {"WeekNo", type text}, {"Revenue", type number}, {"GeoKey", type text}, {"ProductKey", type text}, {"BusinessAreaCode", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"WeekNo", "WeekNo1"}}),
+				    #"Added Conditional Column" = Table.AddColumn(#"Renamed Columns", "WeekNo", each if [WeekNo1] = "W1" then "W2" else if [WeekNo1] = "W13-1" then "W13" else [WeekNo1]),
+				    #"Removed Columns" = Table.RemoveColumns(#"Added Conditional Column",{"BusinessAreaCode", "Country", "DealBased_In/Out", "WeekNo1", "SalesMotion"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

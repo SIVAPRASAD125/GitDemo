@@ -1,0 +1,58 @@
+expression DBConnection =
+		let
+		    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit")
+		in
+		    Source
+	lineageTag: f2c0784a-31c1-4721-a71a-4de33d0ca733
+	queryGroup: 'ROF Group'
+
+	annotation PBI_ResultType = Table
+
+expression CurrWeek =
+		let
+		    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+		    #"ROF_WeekNO_Sheet" = Source{[Schema="dim",Item="ROF_WeekNO"]}[Data],
+		    #"Changed Type" = Table.TransformColumnTypes(ROF_WeekNO_Sheet,{{"CloseDate", type datetime}, {"Day", type datetime}}),
+		    #"Added Custom" = Table.AddColumn(#"Changed Type", "IsCurrentWeek", each Date.From(DateTime.LocalNow()) = Date.From([CloseDate])),
+		    #"Filtered Rows" = Table.SelectRows(#"Added Custom", each ([IsCurrentWeek] = true)),
+		    #"Removed Other Columns" = #"Filtered Rows"{0}[WeekNo1]
+		in
+		    #"Removed Other Columns"
+	lineageTag: 3de56bb3-3205-4a71-87c4-357e55397f77
+	queryGroup: 'ROF Group'
+
+	annotation PBI_ResultType = Number
+
+expression CurrWeek1 =
+		let
+		    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit", [Query="select fiscal_week from [rpt].[dim_current_date_rof]"]),
+		    #"Removed Other Columns" = Source{0}[fiscal_week]
+		in
+		    #"Removed Other Columns"
+	lineageTag: 3b43084e-0a31-43b3-a199-f71dafb554f2
+	queryGroup: 'ROF Group'
+
+	annotation PBI_ResultType = Number
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression ROF_Clari_Final =
+		let
+		    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+		    fact_ROF_Clari_Final = Source{[Schema="fact",Item="ROF_Clari_Final"]}[Data],
+		    #"Added Custom" = Table.AddColumn(fact_ROF_Clari_Final, "Clari/ROF", each "Unadjusted (Clari)"),
+		    #"Removed Columns" = Table.RemoveColumns(#"Added Custom",{"Total", "CountryCode", "BusinessAreaCode"})
+		in
+		    #"Removed Columns"
+	lineageTag: 88370f26-8bb8-40af-be1f-8c41aaab593e
+	queryGroup: 'ROF Group\Facts'
+
+	annotation PBI_ResultType = Exception
+
+expression Limit = 0 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: a3ba6f90-af99-43a1-bda2-ad401c296ebd
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Number
+

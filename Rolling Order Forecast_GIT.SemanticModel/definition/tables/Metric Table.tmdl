@@ -1,0 +1,34 @@
+table 'Metric Table'
+	lineageTag: 47776a2e-44bd-49fc-855d-788ce746043a
+
+	column Column1
+		dataType: string
+		lineageTag: ba3238a2-4e1e-49ce-9cb7-6df3e2972d7e
+		summarizeBy: none
+		sourceColumn: Column1
+		sortByColumn: Column2
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column2
+		dataType: int64
+		formatString: 0
+		lineageTag: e7327f76-13bc-4465-aeda-5d95bddfd52a
+		summarizeBy: sum
+		sourceColumn: Column2
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Metric Table' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WCghU8C9KSS0qVtJRMlSK1YlWCgxxQQgZgYV8DRUCchLzgHxjCN8IxjeB8I1hfFMw36k0JT21BCZmphQbCwA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t, Column2 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

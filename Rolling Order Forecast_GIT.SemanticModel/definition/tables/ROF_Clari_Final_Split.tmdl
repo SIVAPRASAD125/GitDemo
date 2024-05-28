@@ -1,0 +1,102 @@
+table ROF_Clari_Final_Split
+	lineageTag: a3110933-8562-4d87-9a59-574d98d2e048
+
+	column FiscalQuarter
+		dataType: string
+		lineageTag: 7be92525-f388-4d52-8b4b-c83418d5533a
+		summarizeBy: none
+		sourceColumn: FiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 93ec7730-3f00-44b3-87ae-d230cde3d4e0
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column ForecastEntryType
+		dataType: string
+		lineageTag: eccdcba7-5ca7-4456-9d3e-3aa551007006
+		summarizeBy: none
+		sourceColumn: ForecastEntryType
+
+		annotation SummarizationSetBy = Automatic
+
+	column DealBasedType
+		dataType: string
+		lineageTag: dd6ce572-6470-4d2e-ae40-8c6b85a41e3a
+		summarizeBy: none
+		sourceColumn: DealBasedType
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: d1610a1f-3db2-4940-8443-d15f87d2608a
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: 989ec244-7389-4c5b-ba75-bb3beb122e03
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: afd691d0-1a63-4674-8fb7-60cff3508a36
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ColumnWeek
+		dataType: string
+		lineageTag: 95f26ee6-06fd-4447-a216-68053d5459f5
+		summarizeBy: none
+		sourceColumn: ColumnWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: 0f0fbb24-50d8-49e3-a0c3-bbf6853a7051
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Forecast Level' = RELATED('Geo Master'[Clari Forecast Toggle])
+		dataType: string
+		lineageTag: afdf4658-5fa4-4325-9843-cc407bc918ca
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ROF_Clari_Final_Split-c1faf5ee-e23f-4658-9ced-07901411f4ef = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    fact_ROF_Clari_Final_Split = Source{[Schema="fact",Item="ROF_Clari_Final_Split"]}[Data],
+				    #"Removed Columns" = Table.RemoveColumns(fact_ROF_Clari_Final_Split,{"CountryCode", "BusinessAreaCode", "Total"}),
+				    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Removed Columns", {"FiscalQuarter", "Region", "Country", "BU", "DataType", "ForecastEntryType", "DealBasedType", "WeekNo", "GeoKey", "ProductKey"}, "Attribute", "Value"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Unpivoted Columns",{{"Attribute", "ColumnWeek"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Value", type number}}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type",{"BU", "Country", "DataType"})
+				in
+				    #"Removed Columns1"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,22 @@
+table 'Date Last Refreshed'
+	lineageTag: 7637700d-ca39-45e0-a10a-5e39d5215739
+
+	column 'Date Last Refreshed'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c65d25b0-f2c8-4a8c-a9c7-63882bda2232
+		summarizeBy: none
+		sourceColumn: Date Last Refreshed
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Date Last Refreshed-ad2f4b8b-c45a-4574-a91c-8ff3da537c27' = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table[Date Last Refreshed=datetime], {{DateTime.LocalNow()}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

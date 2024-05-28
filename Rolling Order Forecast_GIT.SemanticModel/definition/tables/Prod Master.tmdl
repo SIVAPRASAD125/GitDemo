@@ -1,0 +1,145 @@
+table 'Prod Master'
+	lineageTag: 3c996550-e1aa-42b8-b8b0-0185a162034e
+
+	column 'BU 1'
+		dataType: string
+		lineageTag: 20ac41c0-1598-4e58-9038-5a104132ceb1
+		summarizeBy: none
+		sourceColumn: BU 1
+		sortByColumn: 'Sort 3'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'BU 2'
+		dataType: string
+		lineageTag: e50e70b0-6579-4e40-9ec3-2de5fa0b7a7a
+		summarizeBy: none
+		sourceColumn: BU 2
+		sortByColumn: Sort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'BU 3'
+		dataType: string
+		lineageTag: b30905bb-c38c-43af-aa2e-6fffb6a59a46
+		summarizeBy: none
+		sourceColumn: BU 3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'BU 4'
+		dataType: string
+		lineageTag: 388b4c3c-0f81-4c34-9311-7067408421fc
+		summarizeBy: none
+		sourceColumn: BU 4
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Prod Categ'
+		dataType: string
+		lineageTag: 0d5d8008-d51d-4142-8aa4-60293113ea9e
+		summarizeBy: none
+		sourceColumn: Prod Categ
+		sortByColumn: Sort1
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 5bc3fd1f-2cfd-4204-bc84-c460d8375ee9
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column SecurityBU1
+		dataType: string
+		lineageTag: 9a67a2c9-40e4-4768-bab6-4030c2bb88d4
+		summarizeBy: none
+		sourceColumn: SecurityBU1
+
+		annotation SummarizationSetBy = Automatic
+
+	column SecurityBU2
+		dataType: string
+		lineageTag: bb8df147-c2e3-4966-a0ee-38fdcc3ab3d9
+		summarizeBy: none
+		sourceColumn: SecurityBU2
+
+		annotation SummarizationSetBy = Automatic
+
+	column SecurityBU3
+		dataType: string
+		lineageTag: ae6c1155-4193-4ec7-a843-15095e8f7d40
+		summarizeBy: none
+		sourceColumn: SecurityBU3
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort1 = RELATED('Prod Master Sorting (Prod categ)'[Sort])
+		dataType: int64
+		formatString: 0
+		lineageTag: 8ce91beb-37a9-4811-94d7-65c5ace6e668
+		summarizeBy: sum
+		isDataTypeInferred
+		sortByColumn: Sort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sort 2' = RELATED('Prod Master Sorting (BU)'[Sort])
+		dataType: int64
+		formatString: 0
+		lineageTag: 13fccf73-42fe-46a6-b731-b38e706c7757
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sort 3' = RELATED('Prod Master Sorting (Alternate BU)'[Sort])
+		dataType: int64
+		formatString: 0
+		lineageTag: a6a80cdf-d4f8-41aa-9987-c8214851c2c6
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column level_0
+		dataType: string
+		lineageTag: 66742802-384f-4cf6-9b0c-61e77bd557e3
+		summarizeBy: none
+		sourceColumn: level_0
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 5a03f412-b882-438f-8fc7-66918ecb8646
+		summarizeBy: sum
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Prod Master-e2678f14-498e-4190-9083-6e47c2b3606d' = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"ROF_Product_Sheet" = Source{[Schema="dim",Item="ROF_Product"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(ROF_Product_Sheet,{{"Level_1", type text}, {"Level_2", type text}, {"Level_3", type text}, {"Level_4", type text}, {"Level_5", type text}, {"ProductKey", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Level_1", "BU 1"}, {"Level_2", "BU 2"}, {"Level_3", "BU 3"}, {"Level_4", "BU 4"}, {"Level_5", "Prod Categ"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+

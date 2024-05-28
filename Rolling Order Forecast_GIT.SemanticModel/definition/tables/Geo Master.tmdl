@@ -1,0 +1,112 @@
+table 'Geo Master'
+	lineageTag: 354305d6-2c1a-42a3-86c3-500f363ab8a0
+
+	column Region
+		dataType: string
+		lineageTag: 62d0039c-819a-466a-aaa3-94b4164995aa
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubRegion1
+		dataType: string
+		lineageTag: c1a8e574-7548-4756-835d-970cf22709bb
+		summarizeBy: none
+		sourceColumn: SubRegion1
+		sortByColumn: Sort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubRegion2
+		dataType: string
+		lineageTag: f804f325-fbb6-4bb3-9ee9-4ea7edab03b5
+		summarizeBy: none
+		sourceColumn: SubRegion2
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubRegion3
+		dataType: string
+		lineageTag: fc48dddc-dc7e-4922-816f-0459ab2647bf
+		summarizeBy: none
+		sourceColumn: SubRegion3
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 3ec9b290-971f-46bc-9164-fa4f2a122487
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: 74649b86-34e7-40fe-914a-28ab082e2cb0
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column MOBORegion
+		dataType: string
+		lineageTag: dc76b253-95ac-45f0-91d9-7dddeafb998e
+		summarizeBy: none
+		sourceColumn: MOBORegion
+
+		annotation SummarizationSetBy = Automatic
+
+	column SLICER_region = IF('Geo Master'[MOBORegion] = "Y", "MOBO")
+		dataType: string
+		lineageTag: d9ad0a4f-1ac3-4d75-827e-7fcea058a147
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Clari Forecast Toggle' = ```
+			
+			     IF('Geo Master'[Country] in {"India","Japan"} || (SEARCH("HQ",'Geo Master'[Country],1,0)>0 && 'Geo Master'[Country]<>"MCA HQ" && 'Geo Master'[Country]<>"Germany HQ"),"GEO Forecast","Country Forecast")
+			```
+		dataType: string
+		lineageTag: 2a1d6a09-1df6-42e7-a72e-025515303bba
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegionMoBo
+		dataType: string
+		lineageTag: 595d13e9-af22-4a0a-af0e-61fc0fac1b1d
+		summarizeBy: none
+		sourceColumn: RegionMoBo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort = RELATED('Geo Master Sorting'[Sort])
+		dataType: int64
+		formatString: 0
+		lineageTag: 006dbbb5-6e52-4461-8818-007b1f1ae706
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Geo Master-6d08d331-9d47-4975-8bdd-42fe794831aa' = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"ROF_Geography_Sheet" = Source{[Schema="dim",Item="ROF_Geography"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(ROF_Geography_Sheet,{{"Region", type text}, {"SubRegion1", type text}, {"SubRegion2", type text}, {"SubRegion3", type text}, {"Country", type text}, {"CountryCode", type text}, {"GeoKey", type text}, {"KeyType", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"CountryCode", "KeyType"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

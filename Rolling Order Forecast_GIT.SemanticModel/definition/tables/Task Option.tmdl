@@ -1,0 +1,21 @@
+table 'Task Option'
+	lineageTag: 906524be-3a0f-4959-8231-65fcdb752d12
+
+	column Value
+		dataType: string
+		lineageTag: da64914d-81ba-4027-8741-16cd1f09b6ce
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Task Option-d302c5c9-969a-4d64-96dd-8b50fdccbb47' = calculated
+		mode: import
+		source =
+				
+				{"W Task", "W/O Task"}
+
+	annotation PBI_Id = f5431c340a8f4911b3d8e0ae382b951c
+

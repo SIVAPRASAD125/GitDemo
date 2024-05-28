@@ -1,0 +1,161 @@
+table OrdersDetailed
+	lineageTag: 080972ca-fad1-4a5d-b52b-acfdae2a4422
+
+	column WeekNo1
+		dataType: string
+		isHidden
+		lineageTag: 21bac0fe-fdc8-4d00-952b-d529e691f1d0
+		summarizeBy: none
+		sourceColumn: WeekNo1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 0e489d1e-6feb-49d9-82c1-ed073240ffee
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'End Customer Country Entity Id'
+		dataType: string
+		lineageTag: 9727dc1e-418e-4a12-a47b-161245c7ace4
+		summarizeBy: none
+		sourceColumn: End Customer Country Entity Id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'End Customer Country Entity Name'
+		dataType: string
+		lineageTag: af83b9a1-d353-4b1d-aa08-f69c1cea9036
+		summarizeBy: none
+		sourceColumn: End Customer Country Entity Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Create Date'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: d3ec9786-dae0-45ee-a27d-ead275794558
+		summarizeBy: none
+		sourceColumn: Order Create Date
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'End Customer Party Id'
+		dataType: string
+		lineageTag: 14ed653c-0393-42d3-a460-6d888747612f
+		summarizeBy: none
+		sourceColumn: End Customer Party Id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'End Customer Party Name'
+		dataType: string
+		lineageTag: 4ab972e3-ed6e-4860-b907-041a3441bfb6
+		summarizeBy: none
+		sourceColumn: End Customer Party Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'HPE Opportunity Identifier'
+		dataType: string
+		lineageTag: 44539465-8008-4cb7-a7a3-dd60fa2e355f
+		summarizeBy: none
+		sourceColumn: HPE Opportunity Identifier
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'End Customer Account ST ID'
+		dataType: string
+		lineageTag: cff94478-8fab-4350-990c-2882cfe2df0e
+		summarizeBy: none
+		sourceColumn: End Customer Account ST ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'End Customer Account ST Name'
+		dataType: string
+		lineageTag: 281bdfb6-af3f-470b-95fe-46d88ed46c51
+		summarizeBy: none
+		sourceColumn: End Customer Account ST Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sales Order #'
+		dataType: string
+		lineageTag: 7e899462-3f31-4e39-8099-a217fcce8d97
+		summarizeBy: none
+		sourceColumn: Sales Order #
+
+		annotation SummarizationSetBy = Automatic
+
+	column NetUSD
+		dataType: double
+		lineageTag: d7855a75-f177-4850-bb40-44b89bb8f1d5
+		summarizeBy: sum
+		sourceColumn: NetUSD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Geokey
+		dataType: string
+		lineageTag: 5c710087-bf48-4cd7-951a-650b371912db
+		summarizeBy: none
+		sourceColumn: Geokey
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 6db1252b-0c4a-4c1d-8982-e9ca3ab543a2
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Week No New'
+		dataType: string
+		lineageTag: e26d3f9d-5d2e-4e97-a648-0cbab4878673
+		summarizeBy: none
+		sourceColumn: Week No New
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscalquarter
+		dataType: string
+		lineageTag: 1ad86938-62e5-49c5-a56f-4c731578d9a7
+		summarizeBy: none
+		sourceColumn: fiscalquarter
+
+		annotation SummarizationSetBy = Automatic
+
+	partition OrdersDetailed = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    rpt_ROF_Ordersdetailed = Source{[Schema="rpt",Item="ROF_Ordersdetailed"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(rpt_ROF_Ordersdetailed,{{"Value", "NetUSD"}, {"WeekNo", "WeekNo1"}}),
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Week_No ", each Text.Combine({"W",[WeekNo1]})),
+				    #"Added Conditional Column" = Table.AddColumn(#"Added Custom", "WeekNo", each if [#"Week_No "] = "W1" then "W2" else if [#"Week_No "] = "W13+1" then "W13" else [#"Week_No "]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Conditional Column",{{"Week_No ", type text}, {"WeekNo", type text}}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type",{{"Week_No ", "Week No New"}})
+				in
+				    #"Renamed Columns1"
+
+	annotation PBI_ResultType = Table
+

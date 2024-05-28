@@ -1,0 +1,28 @@
+table 'Month Selection'
+	lineageTag: da249cf1-8b29-4617-93d3-45b97accb5bf
+
+	column Month
+		dataType: string
+		lineageTag: 25d2cf29-0548-40cd-847b-0bda941777e0
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Month Selection-4a03b668-657c-467f-b232-a57e80ffa25a' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Month",STRING,
+				    {
+				        {"M1"},
+				        {"M2"},
+				        {"M3"}
+				    }
+				)
+
+	annotation PBI_Id = 0c6a239cc11f451b99048bcbd5480d2a
+

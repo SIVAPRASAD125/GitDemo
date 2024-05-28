@@ -1,0 +1,93 @@
+table 'dim ROF_WeekNO'
+	lineageTag: ffda3e47-a1ea-42bf-b1de-1fd8b3140a17
+
+	column CloseDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 40d31960-a7f4-4961-a438-e9d1636acb2f
+		summarizeBy: none
+		sourceColumn: CloseDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b2bfbe3c-9c0e-46a3-af0c-1b2fc730a2a9
+		summarizeBy: none
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo1
+		dataType: double
+		lineageTag: 4927cdd5-8c31-4a9c-931b-aad3fcb24e62
+		summarizeBy: sum
+		sourceColumn: WeekNo1
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column WeekNo2
+		dataType: string
+		lineageTag: 2d7c7f25-17c3-4c51-a960-b32e881f396f
+		summarizeBy: none
+		sourceColumn: WeekNo2
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cal Year' = Year('dim ROF_WeekNO'[Day])
+		dataType: int64
+		formatString: 0
+		lineageTag: d195b10f-4288-4c3d-8e00-8ba7692f676c
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Month' = SWITCH('dim ROF_WeekNO'[Cal Month],11,"Nov",12,"Dec",1,"Jan",2,"Feb",3,"Mar",4,"Apr",5,"May",6,"Jun",7,"Jul",8,"Aug",9,"Sep",10,"Oct")
+		dataType: string
+		lineageTag: 2a9601a2-8030-4f21-87a1-2a913eb9c764
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Quarter' = if('dim ROF_WeekNO'[Fiscal Month] = "Nov" || 'dim ROF_WeekNO'[Fiscal Month] = "Dec" ||'dim ROF_WeekNO'[Fiscal Month] = "Jan", "Q1", if('dim ROF_WeekNO'[Fiscal Month] = "Feb" ||'dim ROF_WeekNO'[Fiscal Month] = "Mar" ||'dim ROF_WeekNO'[Fiscal Month] = "Apr","Q2",if('dim ROF_WeekNO'[Fiscal Month] = "May" ||'dim ROF_WeekNO'[Fiscal Month] = "Jun" ||'dim ROF_WeekNO'[Fiscal Month] = "Jul" ,"Q3" ,if('dim ROF_WeekNO'[Fiscal Month] = "Aug" ||'dim ROF_WeekNO'[Fiscal Month] = "Sep" ||'dim ROF_WeekNO'[Fiscal Month] = "Oct" ,"Q4"))))
+		dataType: string
+		lineageTag: 3740cf2c-4e3a-477c-98a8-0a2aa90504c3
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Year' = if('dim ROF_WeekNO'[Cal Month] = 11 || 'dim ROF_WeekNO'[Cal Month] = 12, 'dim ROF_WeekNO'[Cal Year]+1,'dim ROF_WeekNO'[Cal Year])
+		dataType: int64
+		formatString: 0
+		lineageTag: 38a9b14b-d845-41ef-ba23-159c1e83b99d
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cal Month' = MONTH('dim ROF_WeekNO'[Day])
+		dataType: int64
+		formatString: 0
+		lineageTag: 2bcb46fa-113d-4325-ae1b-58190070a625
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'dim ROF_WeekNO-df89ec06-4dca-45ac-abd7-b663e755517a' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    dim_ROF_WeekNO = Source{[Schema="dim",Item="ROF_WeekNO"]}[Data]
+				in
+				    dim_ROF_WeekNO
+
+	annotation PBI_ResultType = Table
+

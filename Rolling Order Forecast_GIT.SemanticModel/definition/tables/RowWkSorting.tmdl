@@ -1,0 +1,51 @@
+table RowWkSorting
+	lineageTag: e55ec34e-a3f9-4312-b971-60ffc1401177
+
+	column Week
+		dataType: string
+		lineageTag: 7fad2045-73a8-4cf2-9617-2f66be9fd74a
+		summarizeBy: none
+		sourceColumn: Week
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c4466a1-2d5e-41a4-aa31-869e6373d0dc
+		summarizeBy: sum
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrentWeek
+		dataType: string
+		lineageTag: cff9aab1-250f-45c2-a7db-b589c5c38645
+		summarizeBy: none
+		sourceColumn: IsCurrentWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	column Open/Close
+		dataType: string
+		lineageTag: 4bc5b202-bf18-4308-93ea-1dcbdf3ed0c7
+		summarizeBy: none
+		sourceColumn: Open/Close
+
+		annotation SummarizationSetBy = Automatic
+
+	partition RowWkSorting-e5b3447c-4704-4c27-9bf0-1a9823e3368d = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("Lc67EcAgEAPRVjyXmgDxpxIHDP23YYkjfBvtWvbheR9kCwbbgU5yopM7y6Czu8iRLu5KT7I6GznI5uxkJ7tzkI0czklWcjoR6aKVeIPmztudg+40h3uHs6dw96A/7YF/+wc=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Week = _t, SortOrder = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Week", type text}, {"SortOrder", Int64.Type}}),
+				    Custom1 = Table.AddColumn(#"Changed Type", "IsCurrentWeek", each if [SortOrder] = CurrWeek1 then "True" else "False"),
+				    Custom2 = Table.AddColumn(#"Custom1", "Open/Close", each if [SortOrder]>=CurrWeek1 then "Open" else "Close")
+				in
+				    Custom2
+
+	annotation PBI_ResultType = Table
+

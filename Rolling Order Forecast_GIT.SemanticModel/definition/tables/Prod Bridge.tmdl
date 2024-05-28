@@ -1,0 +1,276 @@
+table 'Prod Bridge'
+	lineageTag: 0a27f205-ec7e-4088-b08c-bf7b726d7325
+
+	column ProductKey
+		dataType: string
+		lineageTag: 3e4fd977-a261-453f-a2df-d623a1c7cc14
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_6_Description
+		dataType: string
+		lineageTag: 4c4a4654-7b5b-4657-b12c-03caa9c89aae
+		summarizeBy: none
+		sourceColumn: Level_6_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_5_Description
+		dataType: string
+		lineageTag: 2c1961b0-ac63-4718-8242-cf5e8f320b33
+		summarizeBy: none
+		sourceColumn: Level_5_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_4_Description
+		dataType: string
+		lineageTag: 879c3f5a-5db0-40a5-a11d-ff29535b3b7c
+		summarizeBy: none
+		sourceColumn: Level_4_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_3_Description
+		dataType: string
+		lineageTag: 9e3ad9ea-7998-419c-8ed2-2522296c7e71
+		summarizeBy: none
+		sourceColumn: Level_3_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_2_Description
+		dataType: string
+		lineageTag: 3264fbd8-ef4a-4d1e-9e32-7dfe9e9f062f
+		summarizeBy: none
+		sourceColumn: Level_2_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_1_Description
+		dataType: string
+		lineageTag: 69f6d8e5-52c1-4303-8d24-0f6343953ceb
+		summarizeBy: none
+		sourceColumn: Level_1_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column PL_Name
+		dataType: string
+		lineageTag: 8bc6ff2a-d494-4e22-9c26-eccbd55cc200
+		summarizeBy: none
+		sourceColumn: PL_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUGroup
+		dataType: string
+		lineageTag: 8dfda4a8-7056-400d-adef-7529a573e183
+		summarizeBy: none
+		sourceColumn: GBUGroup
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUSubGroup
+		dataType: string
+		lineageTag: 8c924d88-37fc-4ed6-a73c-c1e2358a2d20
+		summarizeBy: none
+		sourceColumn: GBUSubGroup
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporting
+		dataType: string
+		lineageTag: e84c0f15-2714-4535-8297-b256e2a82056
+		summarizeBy: none
+		sourceColumn: Reporting
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROFProductKEY
+		dataType: string
+		lineageTag: 6034dbad-98d8-4a58-ac3b-5784b7a577a5
+		summarizeBy: none
+		sourceColumn: ROFProductKEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column PET_Level_4_5_Mix
+		dataType: string
+		lineageTag: cd8869c5-7b9c-49b8-a9bb-804ae8cd32d0
+		summarizeBy: none
+		sourceColumn: PET_Level_4_5_Mix
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 9bcaeb38-fb7c-4619-a266-17249636e14c
+		summarizeBy: sum
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUGroup2
+		dataType: string
+		lineageTag: 6dbf21e1-2454-415b-9470-620d7582dce0
+		summarizeBy: none
+		sourceColumn: GBUGroup2
+
+		annotation SummarizationSetBy = Automatic
+
+	column GLProductkey
+		dataType: string
+		lineageTag: 2a32434d-9b16-4df7-b4f3-fa77720d8031
+		summarizeBy: none
+		sourceColumn: GLProductkey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level_1_Descrition_Svc
+		dataType: string
+		lineageTag: c748613a-dea4-4b45-be60-e81bf0fba9ce
+		summarizeBy: none
+		sourceColumn: Level_1_Descrition_Svc
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUGroup3
+		dataType: string
+		lineageTag: 2a31ef2e-acce-46c0-adca-9bf3e22234f1
+		summarizeBy: none
+		sourceColumn: GBUGroup3
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUGroup4
+		dataType: string
+		lineageTag: f892e56d-cebf-47a9-ad80-34f22c8dbe4d
+		summarizeBy: none
+		sourceColumn: GBUGroup4
+
+		annotation SummarizationSetBy = Automatic
+
+	column BUFlag = if('Prod Bridge'[GBUGroup] in {"Edge","HPE Products"} ,if('Prod Bridge'[GBUGroup2]<>"GreenLake","HW","GL HW"),'Prod Bridge'[GBUGroup2])
+		dataType: string
+		lineageTag: b2b3fb30-90a0-4419-b8ce-c89041664826
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUGroup6 = IF('Prod Bridge'[Level_2_Description] IN {"A&PS","Software"},'Prod Bridge'[GBUSubGroup],'Prod Bridge'[GBUGroup4])
+		dataType: string
+		lineageTag: a814f11a-0645-4363-ac2e-acb1638f9641
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column OriginalProductKey
+		dataType: string
+		lineageTag: 0b49e4d6-044a-453f-8bf4-9072a986547e
+		summarizeBy: none
+		sourceColumn: OriginalProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column HierarchyFlag
+		dataType: string
+		lineageTag: 50bd17c3-462a-401a-a1c2-a598441d3544
+		summarizeBy: none
+		sourceColumn: HierarchyFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Level_4_Description (original)'
+		dataType: string
+		lineageTag: ee14cc65-426c-48a3-b044-426e2baf253f
+		summarizeBy: none
+		sourceColumn: Level_4_Description (original)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Level_3_Description (original)'
+		dataType: string
+		lineageTag: f8a32f10-3fb0-4cfa-9698-67611db1a4e0
+		summarizeBy: none
+		sourceColumn: Level_3_Description (original)
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUSubGroup2
+		dataType: string
+		lineageTag: 41db8b31-d41e-4c74-80aa-7ec160464aad
+		summarizeBy: none
+		sourceColumn: GBUSubGroup2
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUGroup5
+		dataType: string
+		lineageTag: aa36ab6a-ed53-4955-8245-cd0e6cc6835c
+		summarizeBy: none
+		sourceColumn: GBUGroup5
+
+		annotation SummarizationSetBy = Automatic
+
+	column internalGLNLrep
+		dataType: string
+		lineageTag: 1a5ba570-9e5f-44bb-9914-f7bd7ba53f3f
+		summarizeBy: none
+		sourceColumn: internalGLNLrep
+
+		annotation SummarizationSetBy = Automatic
+
+	column HW/Services
+		dataType: string
+		lineageTag: d658f988-c0be-40e9-a0a8-397dd07e1ffe
+		summarizeBy: none
+		sourceColumn: HW/Services
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUSubGroup3 = ```
+			IF('Prod Bridge'[GBUSubGroup]in{"OS","GL OS","Compute Subscription Services","GL Compute Subscription Services"},"OS",
+			                    IF('Prod Bridge'[GBUSubGroup]in{"GL A&PS","A&PS"},"A&PS",
+			                        IF('Prod Bridge'[GBUGroup]="Hybrid Cloud Software",'Prod Bridge'[GBUGroup],
+			                                IF('Prod Bridge'[GBUGroup]in {"Edge Services","Telco Solutions","Edge SASE"},"Edge",
+			                                    IF('Prod Bridge'[GBUSubGroup]in {"Private Cloud","GL Private Cloud"},"Private Cloud",
+			                               
+			                                "")))))
+			```
+		dataType: string
+		lineageTag: e880f7f8-1ed6-4116-8cce-320b69505082
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column GBUSubGroup4 =
+			IF('Prod Bridge'[GBUSubGroup3]="Hybrid Cloud Software",'Prod Bridge'[Level_3_Description],'Prod Bridge'[GBUSubGroup])
+			
+			//IF('Prod Bridge'[Level_2_Description] IN {"A&PS","Software"},'Prod Bridge'[GBUSubGroup],'Prod Bridge'[GBUGroup4])
+		dataType: string
+		lineageTag: f71b199f-a69b-4a29-b694-054d54cf5ee4
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Prod Bridge-ed3d69ff-64f6-46cf-9767-340d817786d8' = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"ROF_Geography_Sheet" = Source{[Schema="rpt",Item="Product_All"]}[Data],
+				    #"Removed Columns" = Table.RemoveColumns(ROF_Geography_Sheet,{"Alternate BU", "BusinessAreaCode", "CloudService", "FocusProducts", "GBUGroupSecurity", "Trad_vs_aaS"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Exception
+

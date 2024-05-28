@@ -1,0 +1,31 @@
+table 'Prod Master Sorting (Alternate BU)'
+	lineageTag: 77d57a75-f21c-47bc-bd90-a76feb59953c
+
+	column 'Alternate BU'
+		dataType: string
+		lineageTag: 7e08c759-df85-4002-9a98-b263b809bad0
+		summarizeBy: none
+		sourceColumn: Alternate BU
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: b756d311-8bdd-446e-a75d-1ea189b38fa4
+		summarizeBy: none
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Prod Master Sorting (Alternate BU)' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45Wcs7PLSgtSVXSUTJUitWJVgouyS9KTAfxjcB8jwBnhZhSAwMjMwVHT6CoMVg0oCizLLEkVcE5J780BShqAhZ1y0mtUAjOzyktyczPK1YITi0qy0xOLQbKm4LlXVPABpspxcYCAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Alternate BU" = _t, Sort = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Alternate BU", type text}, {"Sort", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

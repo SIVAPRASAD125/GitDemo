@@ -1,0 +1,122 @@
+table 'rpt dim_current_date_rof'
+	lineageTag: c3eee537-9573-47c2-8919-7a15ca84f64d
+
+	column datekey
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 749a90cf-a4a1-4635-8555-0254f3cf3ebd
+		summarizeBy: none
+		sourceColumn: datekey
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column fiscal_year
+		dataType: double
+		lineageTag: df5913ef-1338-4a1c-9322-b10fd1c76665
+		summarizeBy: sum
+		sourceColumn: fiscal_year
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fiscal_quarter
+		dataType: double
+		lineageTag: 41c55981-9e19-4326-ab61-a751af68343d
+		summarizeBy: sum
+		sourceColumn: fiscal_quarter
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fiscal_month
+		dataType: int64
+		formatString: 0
+		lineageTag: eb2b5730-76f2-4e46-a639-1eb054589f30
+		summarizeBy: sum
+		sourceColumn: fiscal_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_week
+		dataType: int64
+		formatString: 0
+		lineageTag: 8038e06c-9174-48cf-8fc6-d8b852fc0930
+		summarizeBy: sum
+		sourceColumn: fiscal_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalQuarterStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0a01fa3a-40cd-4dd4-9d71-82c862882d85
+		summarizeBy: none
+		sourceColumn: FiscalQuarterStartDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Latest FYQ' = CONCATENATE('rpt dim_current_date_rof'[fiscal_year] & "-Q",CONCATENATE('rpt dim_current_date_rof'[fiscal_quarter] & "-Week",IF('rpt dim_current_date_rof'[fiscal_week]=14,"13-1",'rpt dim_current_date_rof'[fiscal_week])))
+		dataType: string
+		lineageTag: 82d83732-3e1c-4d32-9e98-10c8928114a0
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column weekday = WEEKDAY('rpt dim_current_date_rof'[datekey])
+		dataType: int64
+		formatString: 0
+		lineageTag: f51f26cb-506a-4ce2-bc90-6bcbf81cb87f
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column Actualsavaialble
+		dataType: string
+		lineageTag: b0ea034f-797b-492a-b359-043d81fb8725
+		summarizeBy: none
+		sourceColumn: Actualsavaialble
+
+		annotation SummarizationSetBy = Automatic
+
+	column Current_Week = "- Wk" & 'rpt dim_current_date_rof'[fiscal_week]
+		dataType: string
+		isHidden
+		lineageTag: f60cec93-3d5f-47de-82fc-4259471c0f26
+		summarizeBy: none
+		isDataTypeInferred
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Qtd_orders_title = ```
+			"Wk" & 'rpt dim_current_date_rof'[fiscal_week] & " QTD Net Orders" 
+			```
+		dataType: string
+		lineageTag: 897cf93d-a66f-43db-bda9-36a233902c88
+		summarizeBy: none
+		isDataTypeInferred
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'rpt dim_current_date_rof-62906c01-7036-4f8d-a527-32613a7bd8e1' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    rpt_dim_current_date = Source{[Schema="rpt",Item="dim_current_date_rof"]}[Data]
+				in
+				    rpt_dim_current_date
+
+	annotation PBI_ResultType = Exception
+

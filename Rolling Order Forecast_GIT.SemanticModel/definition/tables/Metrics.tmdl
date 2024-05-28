@@ -1,0 +1,33 @@
+table Metrics
+	lineageTag: 7cf9aba4-ddef-46c0-bf41-277ad45129bc
+
+	column 'Forecast vs Flash'
+		dataType: string
+		lineageTag: 9f53af2f-c82a-4379-a4f6-d0dad416bdcf
+		summarizeBy: none
+		sourceColumn: Forecast vs Flash
+		sortByColumn: Index
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Index
+		dataType: string
+		lineageTag: 7fd2ecbe-b96a-4bf7-9439-c5b710c92397
+		summarizeBy: none
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Metrics-4e1735f1-2243-4854-8b78-244002c7fa69 = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WckwuKU3MKVYoK1YICFfSUTJUitVBE1XQcC7N1QTKGYHlXFJzShIVSvIV3HISizOAwsZgYVWF/DS4kIlSbCwA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Forecast vs Flash" = _t, Index = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Forecast vs Flash", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

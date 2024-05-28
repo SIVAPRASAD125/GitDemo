@@ -1,0 +1,160 @@
+table ColWkSorting
+	lineageTag: 8c2f4f7c-1a97-49fd-959d-d8126ebb3019
+
+	column Weeks
+		dataType: string
+		lineageTag: 588e33ae-bb16-4943-8ef5-9ff96b88f77a
+		summarizeBy: none
+		sourceColumn: Weeks
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e9f0c77-a1eb-4a2e-9eac-cdc0e6d486bd
+		summarizeBy: sum
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrentWeek
+		dataType: string
+		lineageTag: a7743264-0188-4ab9-aa72-05d19bd59297
+		summarizeBy: none
+		sourceColumn: IsCurrentWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	column Open/Close
+		dataType: string
+		lineageTag: 9534e69b-c4a9-49f0-b843-60d2fa14fbc0
+		summarizeBy: none
+		sourceColumn: Open/Close
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weeksdyn = ```
+			IF(ColWkSorting[IsCurrentWeek]="True", "CurrWeek")
+			/*VAR A = CALCULATE(MAX(ColWkSorting[SortOrder]),FILTER('ColWkSorting',ColWkSorting[IsCurrentWeek]="True"))
+			VAR B = IF(WEEKDAY(TODAY()) >=4 && VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y",A+1,A)
+			--IF(WEEKDAY(TODAY())=4,A+1,A)
+			Return 
+			IF(ColWkSorting[SortOrder]=B,"CurrWeek",BLANK())*/
+			
+			
+			--IF(ColWkSorting[IsCurrentWeek]="True", "CurrWeek")
+			 
+			
+			 
+			            
+			```
+		dataType: string
+		lineageTag: d528e4a6-1df3-4ae9-a30a-9b94e358a76b
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column WKDyn = ```
+			VAR A = CALCULATE(MAX(ColWkSorting[SortOrder]),FILTER('ColWkSorting',ColWkSorting[Weeksdyn]="CurrWeek"))
+			VAR B = IF(WEEKDAY(TODAY()) >=4 && VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y",A,A-1) --IF(WEEKDAY(TODAY())>=4,A-1,A)
+			Return 
+			IF(ColWkSorting[SortOrder]=B,"CurrWeek-1",BLANK())
+			
+			
+			--- changed 12-14-2023
+			/*WKDyn = VAR A = CALCULATE(MAX(ColWkSorting[SortOrder]),FILTER('ColWkSorting',ColWkSorting[Weeksdyn]="CurrWeek"))
+			VAR B = IF(WEEKDAY(TODAY()) >=4 && VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y",A,A-1) --IF(WEEKDAY(TODAY())>=4,A-1,A)
+			Return 
+			IF(ColWkSorting[SortOrder]=B,"CurrWeek-1",BLANK())*/
+			
+			
+			/*
+			----------
+			VAR A = CALCULATE(MAX(ColWkSorting[SortOrder]),FILTER('ColWkSorting',ColWkSorting[Weeksdyn]="CurrWeek"))
+			VAR B = (A-1)
+			Return
+			IF(ColWkSorting[SortOrder]=B,"CurrWeek-1",BLANK())
+			----------
+			*/
+			/**CALCULATE(MAX(ColWkSorting[SortOrder]),FILTER('ColWkSorting',ColWkSorting[Weeksdyn]="CurrWeek"))
+			VAR B =  (A+1)
+			VAR C =  (A+2)
+			Return
+			
+			IF(ColWkSorting[Weeksdyn]="CurrWeek","CurrWeek",
+			IF(ColWkSorting[SortOrder]=B,"CurrWeek+1",
+			IF(ColWkSorting[SortOrder]=C,"CurrWeek+2",BLANK())))**/
+			
+			```
+		dataType: string
+		lineageTag: ab428912-2bde-4960-ab98-e5caf8ad47c9
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column WEEKDAY = WEEKDAY(TODAY())
+		dataType: int64
+		formatString: 0
+		lineageTag: 68282fe8-6375-4a80-92ff-056254a5d403
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column CLARIWk = ```
+			
+			Var Today = TODAY()
+			Var ClariRefresh = DATEVALUE(CALCULATE(max(DataRefreshConfig[RefreshDate]),FILTER(DataRefreshConfig,DataRefreshConfig[Source]="Clari")))
+			Var DayinWeek= WEEKDAY(Today,2)
+			--Var WK = CALCULATE(MAX(ColWkSorting[SortOrder]),FILTER('ColWkSorting',ColWkSorting[Weeksdyn]="CurrWeek"))
+			Var WK = CALCULATE(MAX(ColWkSorting[SortOrder]),FILTER('ColWkSorting',ColWkSorting[IsCurrentWeek]="True"))
+			Var Wk_Next = Wk+1
+			
+			Var ClariWktoShow = IF(DayinWeek=1 && ClariRefresh<Today,Wk,
+			                         IF(DayinWeek=1 && ClariRefresh=Today,WK_Next,
+			                             IF(DayinWeek in {2,3},WK_Next,
+			                                 IF(DayinWeek >3,WK))))
+			Return 
+			--IF(DayinWeek=1 && ClariRefresh=Today,WK_Next,0)
+			IF(ClariWktoShow=ColWkSorting[SortOrder],"Curr Wk",ColWkSorting[Weeks])
+			
+			```
+		dataType: string
+		lineageTag: 71bf498a-e171-4813-a39c-78e7364cc240
+		summarizeBy: none
+		sortByColumn: SortOrder
+
+		changedProperty = DataType
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'QTD Monthly Plan' =
+			IF('ColWkSorting'[Weeks] in {"W1","W2","W3","W4","W5"},"QTD M1 Plan",
+			IF(ColWkSorting[Weeks] in {"W6","W7","W8","W9","W10"},"QTD M2 Plan","QTD M3 Plan"))
+		dataType: string
+		lineageTag: cfa82ad5-3bda-4851-be2a-1a23f4efc5b6
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ColWkSorting-db2008e9-6e4b-4d6c-9ac8-f4b860f9f3d8 = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("Nc3JDcAgEEPRXuZMJMxOJTkg+m8jHkxuz5Klv5a9sGCwHchEJjGTWSxkEStZxUY2sZNdHOQQJzlFRG/EO07wFuFJ3CY8ivyP5xxZ3h8=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Weeks = _t, SortOrder = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Weeks", type text}, {"SortOrder", Int64.Type}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "IsCurrentWeek", each if [SortOrder] = CurrWeek1 then "True" else "False"),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Open/Close", each if [SortOrder]>=CurrWeek1 then "Open" else "Close")
+				in
+				    #"Added Custom1"
+
+	annotation PBI_ResultType = Table
+

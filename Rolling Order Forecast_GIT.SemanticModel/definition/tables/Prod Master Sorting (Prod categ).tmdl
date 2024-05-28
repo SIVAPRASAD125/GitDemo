@@ -1,0 +1,31 @@
+table 'Prod Master Sorting (Prod categ)'
+	lineageTag: c5945b72-26ea-4f55-ac46-122c57ff4566
+
+	column 'Prod Categ'
+		dataType: string
+		lineageTag: bb2ace4f-f826-4112-ac2d-6599f44bf1d7
+		summarizeBy: none
+		sourceColumn: Prod Categ
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 61cd6f5e-cba2-4df3-8265-ffb72e82a5b6
+		summarizeBy: sum
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Prod Master Sorting (Prod categ)' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("bZFBU8IwEIX/yk5PMMOhtFr1WANaB6yVHmCmcog0QMea7aQp6L83yQrVGY777XubfZui8Bh+Np0WkCyBoRLeyBt761Hh5RoV3/3loeMPtfiCHOtOVyhb6O1GEVxS9IOM4uqiQqhDtRGtfZsez1R14GYqq7EryTn2XYcp/g3TFbHrHq0mMIgbrGuEYAZvne8HEUSzIQkjJ0xR2m0aYjeOLUSrAbeQZOzkip9OiW+d5H/rUQkh5/xDwMCc5pefEgyN6c6ZpqWN/GqPQotPWAqx6t65zRKcURIyC8IzyIRsuSzRUrrWi94LBfmx0pt9JXe2QcGX8zi1FaXLcauPnH6QsuXP97agFAs01ya32XD9Aw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Prod Categ" = _t, Sort = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Prod Categ", type text}, {"Sort", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

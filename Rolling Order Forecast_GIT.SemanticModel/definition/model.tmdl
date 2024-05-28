@@ -1,0 +1,87 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup 'ROF Group'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'ROF Group\Facts'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'ROF Group\Dims'
+
+	annotation PBI_QueryGroupOrder = 1
+
+annotation PBI_QueryOrder = ["ROF Forecast","ROF OrderPlan","Non Executable","Pipeline","FlashBudget","EOP","ROF BudgetPlan","ColWkSorting","Geo Master","Geo Bridge","Prod Bridge","RowWkSorting","Prod Master","DBConnection","CurrWeek","Calcs","DataRefreshConfig","Date Last Refreshed","ROF Pipeline","UAM Attributes","rpt dim_current_date_rof","Load Bookings","Month new","dim ROF_WeekNO","Metric Definitions","CurrWeek1","Custom notifications","ROF_Clari_Final","ROF_Clari_Final_Split","Metrics","TOPN","w / wo Decimal","rpt flashbudget_OR","dim GeoProduct","Date","Pipeline_Services","ROF_NEO","Sort Forecast Category","Geo Master Sorting","Table_TempSecurity","Prod Master Sorting (Prod categ)","Prod Master Sorting (BU)","Prod Master Sorting (Alternate BU)","Limit","OrdersDetailed","QTD Plans","fact ROF_Actuals_PQ","Metric Table","Table_OL","TableNew"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBIDesktopVersion = 2.129.905.0 (24.05)
+
+annotation __TEdtr = 1
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
+
+ref table 'ROF Forecast'
+ref table 'ROF OrderPlan'
+ref table 'Non Executable'
+ref table Pipeline
+ref table FlashBudget
+ref table EOP
+ref table 'ROF BudgetPlan'
+ref table ColWkSorting
+ref table 'Geo Master'
+ref table RowWkSorting
+ref table 'Prod Master'
+ref table Calcs
+ref table 'Month Selection'
+ref table 'Task Option'
+ref table DataRefreshConfig
+ref table 'ROF Pipeline'
+ref table 'Top Deal Count'
+ref table 'Dummy Table'
+ref table 'Date Last Refreshed'
+ref table 'UAM Attributes'
+ref table 'rpt dim_current_date_rof'
+ref table 'Geo Bridge'
+ref table 'Prod Bridge'
+ref table 'Load Bookings'
+ref table 'Days Table'
+ref table 'Month new'
+ref table 'dim ROF_WeekNO'
+ref table 'Metric Definitions'
+ref table 'Custom notifications'
+ref table ROF_Clari_Final_Split
+ref table Metrics
+ref table TOPN
+ref table 'w / wo Decimal'
+ref table 'rpt flashbudget_OR'
+ref table 'dim GeoProduct'
+ref table Date
+ref table Pipeline_Services
+ref table ROF_NEO
+ref table 'Sort Forecast Category'
+ref table 'Geo Master Sorting'
+ref table Table_TempSecurity
+ref table 'Prod Master Sorting (Prod categ)'
+ref table 'Prod Master Sorting (BU)'
+ref table 'Prod Master Sorting (Alternate BU)'
+ref table OrdersDetailed
+ref table 'QTD Plans'
+ref table 'fact ROF_Actuals_PQ'
+ref table 'Metric Table'
+ref table Table_OL
+ref table TableNew
+
+ref role 'UAM Role'
+
+ref perspective 'Custom Report'
+
+ref cultureInfo en-US
+

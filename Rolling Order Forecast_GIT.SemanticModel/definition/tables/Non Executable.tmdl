@@ -1,0 +1,108 @@
+table 'Non Executable'
+	lineageTag: 67e828a3-9519-4b22-93ed-a790d86d99aa
+
+	column FiscalQuarter
+		dataType: string
+		lineageTag: 7949b9fc-f805-4e1b-b45c-68c9c5e7bc27
+		summarizeBy: none
+		sourceColumn: FiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 2e9dd4b1-d3fe-4e90-8831-3a5c12236f78
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geography
+		dataType: string
+		lineageTag: c8c39a8d-d6e6-40ee-93bc-13fb6ef018b2
+		summarizeBy: none
+		sourceColumn: Geography
+
+		annotation SummarizationSetBy = Automatic
+
+	column BU
+		dataType: string
+		lineageTag: 4c376a5d-ee8c-4cdf-a3dc-88df8b7d20ea
+		summarizeBy: none
+		sourceColumn: BU
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weekno
+		dataType: string
+		lineageTag: 8a35ebc2-1c7d-45ea-aff0-bd7ea308b1c0
+		summarizeBy: none
+		sourceColumn: Weekno
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: 85179dee-c23c-4d8b-8b6e-46567cf5f0aa
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column id
+		dataType: string
+		lineageTag: 58bf2c1b-52e0-4383-8c9e-e0c204b11b5a
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: b4eda77f-30f5-4dad-8fc0-885e2ea3ae90
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 87dd8c33-cccc-4544-ae02-126b15d609ad
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column BusinessAreaCode
+		dataType: string
+		lineageTag: f8b49db3-26a7-4c22-b8b2-4da3adc004c0
+		summarizeBy: none
+		sourceColumn: BusinessAreaCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthPlan
+		dataType: string
+		lineageTag: a4d4d5e1-83f6-4371-b3d6-f885bfd23492
+		summarizeBy: none
+		sourceColumn: MonthPlan
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Non Executable-1b939eb4-1be1-4fb1-80cb-21d8a5a20467' = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"fact ROF_NonExecutableOrders_Sheet" = Source{[Schema="fact",Item="ROF_NonExecutableOrders"]}[Data],
+				    #"Filtered Rows" = Table.SelectRows(#"fact ROF_NonExecutableOrders_Sheet", each true),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows",{{"FiscalQuarter", type text}, {"Region", type text}, {"Geography", type text}, {"BU", type text}, {"Weekno", type text}, {"Value", type number}, {"UpdatedBy", type any}, {"UpdatedTime", type any}, {"id", type text}, {"GeoKey", type text}, {"CountryCode", type any}, {"ProductKey", type text}, {"BusinessAreaCode", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"UpdatedBy", "UpdatedTime", "CountryCode"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

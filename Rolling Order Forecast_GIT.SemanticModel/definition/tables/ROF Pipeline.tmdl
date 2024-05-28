@@ -1,0 +1,209 @@
+table 'ROF Pipeline'
+	lineageTag: 188cf656-0507-4ed1-9f6a-cbf781acff85
+
+	column 'HPE Opportunity Id'
+		dataType: string
+		lineageTag: 6fe6cf10-facd-4286-872e-f30290e01a78
+		summarizeBy: none
+		sourceColumn: HPE Opportunity Id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Opportunity Close Date'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 5861b95b-f536-4a4d-9981-f76b7b3dab3c
+		summarizeBy: none
+		sourceColumn: Opportunity Close Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'Account Name'
+		dataType: string
+		lineageTag: 1ef4c6cf-f54f-47fa-aa4d-4ef223e40d28
+		summarizeBy: none
+		sourceColumn: Account Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account ST ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: b09370a6-ecaf-49ca-b996-1d6899b23690
+		summarizeBy: count
+		sourceColumn: Account ST ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Opportunity Name'
+		dataType: string
+		lineageTag: f0d4a730-c5d8-4ca6-a735-62d405c1081b
+		summarizeBy: none
+		sourceColumn: Opportunity Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Forecast Category'
+		dataType: string
+		lineageTag: 19955131-1103-4550-b0fc-0e66ceab2617
+		summarizeBy: none
+		sourceColumn: Forecast Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sales Stage'
+		dataType: string
+		lineageTag: 819c3a77-9e2a-4a13-8f1e-69346d501aef
+		summarizeBy: none
+		sourceColumn: Sales Stage
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Opportunity Owner'
+		dataType: string
+		lineageTag: 057a8cf0-8c74-4714-bc52-3109c146ecf2
+		summarizeBy: none
+		sourceColumn: Opportunity Owner
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo1
+		dataType: string
+		lineageTag: c95b9050-6dcf-46a5-8c3f-eea7adce18d0
+		summarizeBy: none
+		sourceColumn: WeekNo1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: ca2b02a6-e9ed-48ce-ae38-c287c4a6a5cb
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Country Name'
+		dataType: string
+		lineageTag: d6c21d2c-320b-4211-9735-ed699111280b
+		summarizeBy: none
+		sourceColumn: Country Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROFGeoKey
+		dataType: string
+		lineageTag: 61521f92-f312-4ca7-b9f3-a78ea3744feb
+		summarizeBy: none
+		sourceColumn: ROFGeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROFProductKey
+		dataType: string
+		lineageTag: ebb629ee-1b03-48a0-a0f5-6bf3b288e2bf
+		summarizeBy: none
+		sourceColumn: ROFProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lightning URL'
+		dataType: string
+		lineageTag: 08cca455-bed1-4da3-9f00-a73dd5b7f430
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: Lightning URL
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SFDC URL'
+		dataType: string
+		lineageTag: 14f996b0-205a-4f9c-a6f2-851c714296a6
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: SFDC URL
+
+		annotation SummarizationSetBy = Automatic
+
+	column DealBased_In/Out
+		dataType: string
+		lineageTag: f4a7f354-4e5b-41c7-a0bc-2048e1dc1b92
+		summarizeBy: none
+		sourceColumn: DealBased_In/Out
+
+		annotation SummarizationSetBy = Automatic
+
+	column OpportunityUpdateText
+		dataType: string
+		lineageTag: 502a1684-a80a-4f11-bb48-4a4422f402cb
+		summarizeBy: none
+		sourceColumn: OpportunityUpdateText
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 534771b3-7d2f-41df-b6fa-7f4697ea5fd3
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column HasGreenLake
+		dataType: string
+		lineageTag: 90ac9d15-8501-4fd9-9994-e143966f81d8
+		summarizeBy: none
+		sourceColumn: HasGreenLake
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Strategic Deal Exec Sponsor'
+		dataType: string
+		lineageTag: 5513b178-2716-4aad-a38c-1d7420617b96
+		summarizeBy: none
+		sourceColumn: Strategic Deal Exec Sponsor
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Strategic Deal Review'
+		dataType: string
+		lineageTag: 30575b46-7946-4461-ad08-035fb98dea88
+		summarizeBy: none
+		sourceColumn: Strategic Deal Review
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Strategic Deal Flag' = IF (ISBLANK('ROF Pipeline'[Strategic Deal Review]),"No","Yes")
+		dataType: string
+		lineageTag: 9359a961-a3f3-48fd-a8bc-2e8bd3bef347
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'ROF Pipeline-a9508ab6-8d2d-428e-be58-fb38d6ddd468' = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				     Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"fact ROF_Pipeline" = Source{[Schema="fact",Item="ROF_Pipeline_detailed"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(#"fact ROF_Pipeline",{{"HPE Opportunity Id", type text}, {"Opportunity Close Date", type datetime}, {"Account Name", type text}, {"Account ST ID", Int64.Type}, {"Opportunity Name", type text}, {"Forecast Category", type text}, {"Sales Stage", type text}, {"Opportunity Owner", type text}, {"Primary Reseller", type text}, {"WeekNo", type text}, {"Opportunity Source ID", type text}, {"BusinessAreaCode", type text}, {"Value", type number}, {"Country Name", type text}, {"ROFGeoKey", type text}, {"ROFProductKey", type text}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Changed Type",{{"Opportunity Close Date", type date}}),
+				    #"Added LightningURL" = Table.AddColumn(#"Changed Type1", "Lightning URL", each "https://hp.lightning.force.com/" & [Opportunity Source ID], type text),
+				    #"Added sfdcURL" = Table.AddColumn(#"Added LightningURL", "SFDC URL", each "https://hp.my.salesforce.com/" & [Opportunity Source ID], type text),
+				    #"Grouped Rows" = Table.Group(#"Added sfdcURL", {"HPE Opportunity Id", "Opportunity Close Date", "Account Name", "Account ST ID", "Opportunity Name", "Forecast Category", "Sales Stage", "Opportunity Owner", "Primary Reseller", "WeekNo", "Opportunity Source ID", "Country Name", "ROFGeoKey", "ROFProductKey", "Lightning URL", "SFDC URL", "DealBased_In/Out", "OpportunityUpdateText", "HasGreenLake","Strategic Deal Exec Sponsor","Strategic Deal Review"}, {{"Value", each List.Sum([Value]), type nullable number}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Grouped Rows",{{"WeekNo", "WeekNo1"}}),
+				    #"Added Conditional Column" = Table.AddColumn(#"Renamed Columns", "WeekNo", each if [WeekNo1] = "W1" then "W2" else if [WeekNo1] = "W13-1" then "W13" else [WeekNo1]),
+				    #"Removed Columns" = Table.RemoveColumns(#"Added Conditional Column",{"Primary Reseller", "Opportunity Source ID"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

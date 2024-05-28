@@ -1,0 +1,66 @@
+table ROF_NEO
+	lineageTag: 8b782e9c-96f0-45ca-8eb9-f5bce6edb083
+
+	column FiscalQuarter
+		dataType: string
+		lineageTag: 28001a13-48bb-4314-b981-a1d5668cea15
+		summarizeBy: none
+		sourceColumn: FiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 35fa7c6e-3288-4fbc-9834-a5412ec4b220
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: 95b36c5d-c2ff-4fbb-94fe-006a725922dd
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 5ff27ba0-3206-46e1-96c6-7855ecd17762
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column NEOPValue
+		dataType: double
+		lineageTag: d3397726-52f9-4d2f-b585-29e81cdd91c2
+		summarizeBy: sum
+		sourceColumn: NEOPValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MonthPlan
+		dataType: string
+		lineageTag: 04e1c6d2-f94f-40a7-8029-0f36868eaabc
+		summarizeBy: none
+		sourceColumn: MonthPlan
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ROF_NEO-f12e2112-f3c9-4b29-bbe3-91c876541d28 = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    fact_ROF_NonExecutableOrdersPlan = Source{[Schema="fact",Item="ROF_NonExecutableOrdersPlan"]}[Data],
+				    #"Removed Columns" = Table.RemoveColumns(fact_ROF_NonExecutableOrdersPlan,{"BU", "BusinessAreaCode", "Country"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

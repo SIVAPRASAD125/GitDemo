@@ -1,0 +1,54 @@
+table 'Days Table'
+	lineageTag: ad58da91-8f1f-4be9-a3de-eaa9269ad3df
+
+	column Day
+		dataType: string
+		lineageTag: d96085c8-e2ea-4ff1-a22b-f5a35c5aa167
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Number
+		dataType: int64
+		formatString: 0
+		lineageTag: a1cdaaa2-2f28-418e-ac4f-75dd4367800c
+		summarizeBy: sum
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'To Go'
+		dataType: int64
+		formatString: 0
+		lineageTag: d0a044ff-42e9-4cbb-b8cc-8eed749acfd0
+		summarizeBy: sum
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [To Go]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Days Table-25cfcdd1-c6f6-4752-a0a0-7b79ab377964' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Day",STRING,
+				    "Number",INTEGER,
+				    "To Go",INTEGER,
+				    {
+				        {"Thu", 4, 1},
+				        {"Fri", 1, 4},
+				        {"Mon", 2, 3},
+				        {"Tue", 3, 2},
+				        {"Wed", 5, 0}
+				    }
+				)
+
+	annotation PBI_Id = 73837f81384b4d1e83966ecbc8e5bace
+

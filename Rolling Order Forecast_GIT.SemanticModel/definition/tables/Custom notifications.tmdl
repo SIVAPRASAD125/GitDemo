@@ -1,0 +1,62 @@
+table 'Custom notifications'
+	lineageTag: d12f616d-91ed-426a-8aa4-ad89f0446ab0
+
+	measure 'Measure Absolute' = SELECTEDVALUE('Custom notifications'[Message])
+		lineageTag: 52576e88-7296-49b7-87cc-56f0291c1a36
+
+	column ReportName
+		dataType: string
+		lineageTag: c1ff34e6-7477-41a1-858d-f2b0134d2115
+		summarizeBy: none
+		sourceColumn: ReportName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Message
+		dataType: string
+		lineageTag: b15fe16a-fa78-4d74-b302-0d912009fe10
+		summarizeBy: none
+		sourceColumn: Message
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomMessage
+		dataType: string
+		lineageTag: 7d5d69d8-3585-4590-ad5a-613c21526843
+		summarizeBy: none
+		sourceColumn: CustomMessage
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Message to Show' =
+			CONCATENATE( 'Custom Notifications'[Message]& "  ",
+			CONCATENATE('Custom Notifications'[CustomMessage]," "))
+		dataType: string
+		lineageTag: 59e86df3-e095-4e86-b8ea-e451b8d46a86
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column RefreshTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c081acb6-40ef-4466-b67f-cbb009f960c6
+		summarizeBy: none
+		sourceColumn: RefreshTime
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Custom notifications-15f29a9e-4ee1-4c30-a097-3d0593724c54' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"Filtered Rows" = Table.SelectRows(Source, each ([Name] = "ref.CustomNotifications")),
+				    ref_CustomNotifications = #"Filtered Rows"{[Schema="ref",Item="CustomNotifications"]}[Data],
+				    #"Filtered Rows1" = Table.SelectRows(ref_CustomNotifications, each ([ReportName] = "ROF"))
+				in
+				    #"Filtered Rows1"
+
+	annotation PBI_ResultType = Table
+

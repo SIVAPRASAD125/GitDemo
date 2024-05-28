@@ -1,0 +1,34 @@
+table TableNew
+	lineageTag: 0ec1c293-5751-4400-9d0a-f47b1cd4d9e2
+
+	column Column1
+		dataType: string
+		lineageTag: 39ebd487-06ca-4c1b-aa8f-8843713112df
+		summarizeBy: none
+		sourceColumn: Column1
+		sortByColumn: Column2
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column2
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e8a066a-97f8-4dfc-8c8e-86730c89bc28
+		summarizeBy: sum
+		sourceColumn: Column2
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TableNew = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45W8kstUfAvSkktKlbSUTJUitWJVvI1VAjIScwD8o3A/LJiBYSQMUSJEYxvAlcCFzKFCTmVpqQDjYcKm4GFA1KL0vKLchPzklOBYuZKsbEA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t, Column2 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

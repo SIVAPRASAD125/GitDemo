@@ -1,0 +1,35 @@
+table 'w / wo Decimal'
+	lineageTag: f357af0d-8034-4d85-a479-aac1feee0de9
+
+	measure 'Sel Decimal' = SELECTEDVALUE('w / wo Decimal'[Decimal Pointer])
+		lineageTag: b77974f1-4a67-4152-855d-8f6d1de4d697
+
+	column 'Decimal Pointer'
+		dataType: string
+		lineageTag: ed03f9ff-e102-47f3-8b17-c578ed78e041
+		summarizeBy: none
+		sourceColumn: Decimal Pointer
+		sortByColumn: DecIndex
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column DecIndex
+		dataType: string
+		lineageTag: 8ee4a3ce-aa7c-4852-9510-d3cb29f35fe3
+		summarizeBy: none
+		sourceColumn: DecIndex
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'w / wo Decimal-c12c6917-6cf1-4d37-a292-4edfb3ebb67f' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WKldISU3OzE3MUdJRMlSK1YlWystHEjJSio0FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Decimal Pointer" = _t, DecIndex = _t])
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,49 @@
+table TOPN
+	lineageTag: ecd4c5a9-6a81-4d61-be0e-178a60cafb82
+
+	measure 'Selected Value' = SELECTEDVALUE('TOPN'[Value])
+		formatString: 0
+		lineageTag: 3d68dc86-68b5-435f-8bd7-00fd0e7ef044
+
+	measure 'Opp ID Rank' =
+			RANKX(ALLSELECTED('ROF Pipeline'[HPE Opportunity Id],'ROF Pipeline'[Account Name],'ROF Pipeline'[Account ST ID],'ROF Pipeline'[Opportunity Name],'ROF Pipeline'[Opportunity Owner],'ROF Pipeline'[Country Name],'ROF Pipeline'[Forecast Category],'ROF Pipeline'[Sales Stage],'ROF Pipeline'[Opportunity Close Date],'ROF Pipeline'[DealBased_In/Out],'ROF Pipeline'[WeekNo1],'ROF Pipeline'[WeekNo],'ROF Pipeline'[Strategic Deal Exec Sponsor],'ROF Pipeline'[Strategic Deal Review],'ROF Pipeline'[OpportunityUpdateText],'ROF Pipeline'[HasGreenLake],'ROF Pipeline'[SFDC URL],'ROF Pipeline'[Lightning URL]),[Total ROF Pipeline Detailed1],,DESC)
+			
+			--RANKX(ALLSELECTED('ROF Pipeline'),[Total ROF Pipeline Detailed],,DESC)
+		formatString: 0
+		lineageTag: 1fa1a110-0698-44a6-a29c-4667297c50a1
+
+	measure selectedtopN = IF(HASONEVALUE('TOPN'[Value]),MIN('TOPN'[Value]),'TOPN'[Opp ID Rank])
+		lineageTag: 5dd672de-a392-4e65-bb2b-4c10988330c7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Opp id in selected' = IF('TOPN'[Opp ID Rank]<=[selectedtopN],1,0)
+		formatString: 0
+		lineageTag: f9b8d931-2846-4209-996b-0b19f4cb2882
+
+	measure 'Top N ID Ranking' = if(isfiltered('TOPN'[Value]),CALCULATE([Total ROF Pipeline Detailed1],TOPN(SELECTEDVALUE('TOPN'[Value]),VALUES('ROF Pipeline'[HPE Opportunity Id]),[Total ROF Pipeline Detailed1],DESC)),[Total ROF Pipeline Detailed1])
+		formatString: #,0
+		lineageTag: e549ebbf-d47c-4167-8974-98147322123e
+
+		changedProperty = FormatString
+
+	column Value
+		dataType: int64
+		formatString: 0
+		lineageTag: 79ac3d09-c2b1-49a7-a881-593fb07f6413
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TOPN-fe023a92-e4ee-4d28-9e96-7f16f78c7639 = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMjRQitWJVjKCUMYQygRCmUIoQwOYGpgimDRcHsiIBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Value = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Value", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

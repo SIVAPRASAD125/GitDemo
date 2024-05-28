@@ -1,0 +1,113 @@
+table Date
+	lineageTag: 85d3a815-cd4c-4ed0-b6b6-9f29cfd83ee6
+
+	column fiscal_weekkey
+		dataType: string
+		lineageTag: ffffd427-1a36-4872-b335-df9320c711a7
+		summarizeBy: none
+		sourceColumn: fiscal_weekkey
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_year
+		dataType: double
+		lineageTag: 7b307526-f3d1-4cb8-926b-f368d78a44bd
+		summarizeBy: sum
+		sourceColumn: fiscal_year
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fiscal_quarter
+		dataType: double
+		lineageTag: fb9333e2-ed03-4d2c-ae9c-a3743e561e8b
+		summarizeBy: sum
+		sourceColumn: fiscal_quarter
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fiscal_week
+		dataType: int64
+		formatString: 0
+		lineageTag: 58b30486-150b-4bee-8e81-db464ec9dad0
+		summarizeBy: sum
+		sourceColumn: fiscal_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column relative_quarter
+		dataType: double
+		lineageTag: 2809a2c4-7f94-4b0c-83b4-8a1ccadd3086
+		summarizeBy: sum
+		sourceColumn: relative_quarter
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column is_current_week
+		dataType: int64
+		formatString: 0
+		lineageTag: 0572b30f-85d2-4ecd-8b83-30162ca305a9
+		summarizeBy: sum
+		sourceColumn: is_current_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_fiscal_week
+		dataType: int64
+		formatString: 0
+		lineageTag: c409ec73-18b4-4f4f-befd-b27496ed5db4
+		summarizeBy: sum
+		sourceColumn: current_fiscal_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column Graph
+		dataType: int64
+		formatString: 0
+		lineageTag: 4302abf1-3d27-4da5-b363-e89d5bee7a91
+		summarizeBy: sum
+		sourceColumn: Graph
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscalqtr = left('Date'[fiscal_weekkey],6)
+		dataType: string
+		lineageTag: a2d7b1e7-8667-4ee2-ae48-0840e5a02cbe
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscalyrQtr = 'Date'[fiscal_year]&"-Q"&'Date'[fiscal_quarter]
+		dataType: string
+		lineageTag: c3c1e364-1a19-4fd9-9d2b-fedcb5369bc7
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column relative_year
+		dataType: double
+		lineageTag: 5ee01697-2fdb-4d1d-90c3-dbbf50bca5dc
+		summarizeBy: sum
+		sourceColumn: relative_year
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Date-1a31afa0-499c-4b16-b72e-3101b6c22093 = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit", [Query="Select * from rpt.date"])
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,59 @@
+table EOP
+	lineageTag: 6818aee6-1556-4794-9f74-194de656932f
+
+	column WeekNo
+		dataType: string
+		lineageTag: 0545ede1-c4d0-4c79-9e6b-15d43e53c3ae
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: 5dcce7a5-97d9-40b8-98c4-a7495ae7ca62
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 107a9ac9-120b-4091-a282-5b5f3bef6b7f
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column EOPValue
+		dataType: double
+		lineageTag: 7490bc7a-4092-41d6-a917-fc5a33814130
+		summarizeBy: sum
+		sourceColumn: EOPValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MonthPlan
+		dataType: string
+		lineageTag: be270b08-a9fe-4ee6-8228-4ef7133e2f95
+		summarizeBy: none
+		sourceColumn: MonthPlan
+
+		annotation SummarizationSetBy = Automatic
+
+	partition EOP-4d8e885a-f58b-4341-b4c2-fb651ff43406 = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"ROF_ExecutableOrdersPlan_Sheet" = Source{[Schema="fact",Item="ROF_ExecutableOrdersPlan"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(ROF_ExecutableOrdersPlan_Sheet,{{"FiscalQuarter", type text}, {"WeekNo", type text}, {"Country", type text}, {"GeoKey", type text}, {"BU", type text}, {"ProductKey", type text}, {"BusinessAreaCode", type text}, {"EOPValue", type number}, {"MonthPlan", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"BU", "BusinessAreaCode", "Country", "FiscalQuarter"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

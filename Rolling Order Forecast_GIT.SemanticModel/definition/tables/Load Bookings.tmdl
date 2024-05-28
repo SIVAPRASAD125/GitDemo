@@ -1,0 +1,85 @@
+table 'Load Bookings'
+	lineageTag: 83954289-ec5b-4de2-af15-3d798db77c23
+
+	column fiscalweekkey = "FY"&left(REPLACE('Load Bookings'[fiscalquarter],1,2,""),2)&right('Load Bookings'[fiscalquarter],2)&'Load Bookings'[weekno]
+		dataType: string
+		lineageTag: 52faf59c-e1df-4020-ae44-5df161517972
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column GP_Key = 'Load Bookings'[geokey]&"_"&'Load Bookings'[ProductKey]&"_"&'Load Bookings'[SalesMotion]
+		dataType: string
+		lineageTag: 67ff8a74-1626-407d-ae14-6193fe49df56
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscalquarter
+		dataType: string
+		lineageTag: ce2fab13-61df-416c-9a08-5d027b3de0b7
+		summarizeBy: none
+		sourceColumn: fiscalquarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column weekno
+		dataType: string
+		lineageTag: c2b77023-bf3d-4eff-a826-a655ff3a96a7
+		summarizeBy: none
+		sourceColumn: weekno
+
+		annotation SummarizationSetBy = Automatic
+
+	column geokey
+		dataType: string
+		lineageTag: 16f53e2c-c078-4225-beca-1f07693ed407
+		summarizeBy: none
+		sourceColumn: geokey
+
+		annotation SummarizationSetBy = Automatic
+
+	column productkey
+		dataType: string
+		lineageTag: f8730033-b20b-46ec-b3ff-ba9bd5c926c1
+		summarizeBy: none
+		sourceColumn: productkey
+
+		annotation SummarizationSetBy = Automatic
+
+	column salesmotion
+		dataType: string
+		lineageTag: e2639236-214d-4c63-a1cb-c7315627afce
+		summarizeBy: none
+		sourceColumn: salesmotion
+
+		annotation SummarizationSetBy = Automatic
+
+	column bookings
+		dataType: double
+		lineageTag: f3ec4aac-9b55-469c-b2d0-a3618821d74d
+		summarizeBy: sum
+		sourceColumn: bookings
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Load Bookings-580eb80e-4b05-49e4-a0f6-1d9816b13e3b' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit", [Query="select * from rpt.loadbookings_BOE where FiscalQuarter=(select cast(fiscal_year as varchar(10))+'-Q'+cast(fiscal_quarter as varchar(5)) from rpt.dim_current_date)"]),
+				    //#"Appended Query" = Table.Combine({Source, LoadBookings_ROF}),
+				    //#"Changed Type" = Table.TransformColumnTypes(#"Source",{{"fiscalquarter", type text}, {"weekno", type text}, {"geokey", type text},{"productkey", type text}, {"RTM", type text},{"Bookings", type number},    {"salesmotion", type text}}),
+				    #"Added W13-1" = Table.TransformColumns (#"Source", {{"weekno", each Text.Replace("W" & _,"W14","W13-1")}} ),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Added W13-1",{"fiscalquarter", "weekno", "geokey", "productkey", "bookings",  "salesmotion"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Other Columns", each ([bookings] <> null)),
+				    #"Replaced Value" = Table.ReplaceValue(#"Filtered Rows",null,"blank",Replacer.ReplaceValue,{"salesmotion"})
+				in
+				    #"Replaced Value"
+
+	annotation PBI_ResultType = Table
+

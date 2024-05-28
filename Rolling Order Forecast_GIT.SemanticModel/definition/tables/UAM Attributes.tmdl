@@ -1,0 +1,94 @@
+table 'UAM Attributes'
+	lineageTag: fd526466-5007-4229-bf38-daea56da10b2
+
+	column RequestID
+		dataType: int64
+		formatString: 0
+		lineageTag: 89f78c1c-81f1-4b5f-b3a4-472cb8fae3bc
+		summarizeBy: count
+		sourceColumn: RequestID
+
+		annotation SummarizationSetBy = Automatic
+
+	column RequestedDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6e73bb66-aca0-4306-a57e-47c59b6e8b67
+		summarizeBy: none
+		sourceColumn: RequestedDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column NTNAME
+		dataType: string
+		lineageTag: 14be4301-46fb-4e6b-93aa-cbf9e6b50898
+		summarizeBy: none
+		sourceColumn: NTNAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmployeeID
+		dataType: string
+		lineageTag: e0c8cfec-f539-40e7-b891-736a11ec1bab
+		summarizeBy: none
+		sourceColumn: EmployeeID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ResourceName
+		dataType: string
+		lineageTag: adb67739-e402-45d3-8522-24439c5c6d37
+		summarizeBy: none
+		sourceColumn: ResourceName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ATTRIBUTE
+		dataType: string
+		lineageTag: 8e6c55fa-120c-4a6f-8f54-63abca1efc5b
+		summarizeBy: none
+		sourceColumn: ATTRIBUTE
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATAFIELD
+		dataType: string
+		lineageTag: 1365281b-91d7-44b3-a08a-c622b36424e7
+		summarizeBy: none
+		sourceColumn: DATAFIELD
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATAVALUE
+		dataType: string
+		lineageTag: 8260da01-4a2a-4047-b6be-032c285162ff
+		summarizeBy: none
+		sourceColumn: DATAVALUE
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmailAddress
+		dataType: string
+		lineageTag: 76f45eb3-469d-4c67-a006-dfb82e1ec3bd
+		summarizeBy: none
+		sourceColumn: EmailAddress
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'UAM Attributes-c2eeed26-0b66-429c-8759-47ed91271cdf' = m
+		mode: import
+		source =
+				let
+				    Source = PowerBI.Dataflows(null),
+				    #"bcdf7dcb-64ea-4e11-aa55-ece3a23a2c01" = Source{[workspaceId="bcdf7dcb-64ea-4e11-aa55-ece3a23a2c01"]}[Data],
+				    #"fe397d83-41c4-4182-bdff-064c2b4ebccb" = #"bcdf7dcb-64ea-4e11-aa55-ece3a23a2c01"{[dataflowId="fe397d83-41c4-4182-bdff-064c2b4ebccb"]}[Data],
+				    #"UAM Attributes1" = #"fe397d83-41c4-4182-bdff-064c2b4ebccb"{[entity="UAM Attributes"]}[Data],
+				    #"Filtered Rows" = Table.SelectRows(#"UAM Attributes1", each ([TypeName] = "POWER BI - PBI Sales Cockpit")),
+				    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"ACCESS", "ALIAS", "TypeName", "OMIT"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

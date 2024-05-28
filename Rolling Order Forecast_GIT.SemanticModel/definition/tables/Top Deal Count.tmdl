@@ -1,0 +1,26 @@
+table 'Top Deal Count'
+	lineageTag: a75d6bd4-7902-4f51-aed3-18eab9fe5c34
+
+	measure 'N Opps' = DISTINCTCOUNT('ROF Pipeline'[HPE Opportunity Id])
+		formatString: 0
+		lineageTag: eac2f013-ecbf-4d6a-8a7d-ceb06b98e004
+
+	column Value
+		dataType: int64
+		formatString: 0
+		lineageTag: a0e81968-bd86-41bf-9beb-29921f7ffa3d
+		summarizeBy: sum
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Top Deal Count-15eab59c-893d-4e45-953d-e527a77301eb' = calculated
+		mode: import
+		source =
+				
+				GENERATESERIES(1,100,1)
+
+	annotation PBI_Id = 3ff96cbf8d6e4c6799444ed01dcd83c2
+

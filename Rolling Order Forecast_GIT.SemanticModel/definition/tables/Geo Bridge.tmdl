@@ -1,0 +1,74 @@
+table 'Geo Bridge'
+	lineageTag: 2ed4a2c4-5090-49e2-8720-ded7bd7671de
+
+	column Region
+		dataType: string
+		lineageTag: 3eb33917-cf83-4e66-943f-5bf3e005c590
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubRegion1
+		dataType: string
+		lineageTag: 7707f160-2f8e-4294-b91a-e4b38d8d5f30
+		summarizeBy: none
+		sourceColumn: SubRegion1
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubRegion2
+		dataType: string
+		lineageTag: d97af526-6f0e-4c1f-b001-e410a9a3c8fd
+		summarizeBy: none
+		sourceColumn: SubRegion2
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: a421daf2-ab3a-452d-8bba-0f3570b3fd71
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporting
+		dataType: string
+		lineageTag: 2e9aab9f-d038-435a-896c-34b69512be46
+		summarizeBy: none
+		sourceColumn: Reporting
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROFGeoKEY
+		dataType: string
+		lineageTag: 2bbd08c1-be57-4bfd-b134-b5d1be53fb0a
+		summarizeBy: none
+		sourceColumn: ROFGeoKEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReportingNew
+		dataType: string
+		lineageTag: a9358cdf-927d-4d0d-85ae-0e9b95a4dd16
+		summarizeBy: none
+		sourceColumn: ReportingNew
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Geo Bridge-b3c57a3b-d415-4e42-b7e3-3d323aaf7c6c' = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"ROF_Geography_Sheet" = Source{[Schema="dim",Item="Geography"]}[Data],
+				    #"Added Custom" = Table.AddColumn(ROF_Geography_Sheet, "ReportingNew", each if [SubRegion2]="China" then "Y"
+				else [Reporting]),
+				    #"Removed Columns" = Table.RemoveColumns(#"Added Custom",{"AdjPipelineSubregion", "Country", "CountryCode", "PETGeo", "RegionSecurity", "SubRegion3", "SubRegion4", "SubRegion5"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

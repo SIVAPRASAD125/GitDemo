@@ -1,0 +1,35 @@
+table 'Geo Master Sorting'
+	lineageTag: ffa097ec-da20-4a5f-8487-d680b7ce8ae7
+
+	column SubRegion1
+		dataType: string
+		lineageTag: ebaaf585-6d5b-42f6-8abf-9493a0c873c6
+		summarizeBy: none
+		sourceColumn: SubRegion1
+		sortByColumn: Sort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 3148567a-88e3-4f36-939f-cd53a50411c0
+		summarizeBy: none
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Geo Master Sorting' = m
+		mode: import
+		queryGroup: 'ROF Group\Dims'
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WcgxwdFbSUbJUitWJVnJOzSspSsxRcC0tyi9IBQobQ4QzMvMSgTwzMM8zLyUTxLMA87wSCxLzgDxzMM/HMdg1CMgzAvP88otKMhQcc1OLMpNBOgwhouGuQLYJmB3q7enr6gjkmoK5HoEgVQZKsbEA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [SubRegion1 = _t, Sort = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"SubRegion1", type text}, {"Sort", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

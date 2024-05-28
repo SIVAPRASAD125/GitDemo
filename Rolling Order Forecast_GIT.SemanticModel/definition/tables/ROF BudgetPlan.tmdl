@@ -1,0 +1,84 @@
+table 'ROF BudgetPlan'
+	lineageTag: edb9cf16-920c-4c02-a7f6-d6c47afc2473
+
+	column fiscalQuarter
+		dataType: string
+		lineageTag: 6d13acd6-f56b-448d-84f7-c56f6459bdcd
+		summarizeBy: none
+		sourceColumn: fiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geography
+		dataType: string
+		lineageTag: 49050bf0-cd8e-4fb0-b82e-d77de7cb3c62
+		summarizeBy: none
+		sourceColumn: Geography
+
+		annotation SummarizationSetBy = Automatic
+
+	column BU
+		dataType: string
+		lineageTag: ee9a373a-fce4-4e7c-87a4-333cb14abc78
+		summarizeBy: none
+		sourceColumn: BU
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 48517724-9ad4-4880-819b-19750bfd4749
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column BudgetPlanValue
+		dataType: double
+		lineageTag: da7d7976-6673-4a75-b1d3-37966c429e34
+		summarizeBy: sum
+		sourceColumn: BudgetPlanValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Status
+		dataType: string
+		lineageTag: 85f6a939-51ce-450e-8715-99d150561f49
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: 3d032666-bc6c-42f9-97bd-fbce88e75a51
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: b1fbbc4c-fa67-4e5d-af46-4ba752474314
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'ROF BudgetPlan-ec95973a-e1f3-4a91-a2bd-99f905143284' = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"fact ROF_Forecast_Sheet" = Source{[Schema="fact",Item="ROF_BudgetPlan"]}[Data],
+				    #"Removed Columns" = Table.RemoveColumns(#"fact ROF_Forecast_Sheet",{"CountryCode", "Geo", "Plan", "UpdatedBy", "UpdatedTime", "Region"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"fiscalQuarter", type text}, {"Geography", type text}, {"BU", type text}, {"WeekNo", type text}, {"BudgetPlanValue", type number}, {"Status", type text}, {"GeoKey", type text}, {"ProductKey", type text}, {"BusinessAreaCode", type text}}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type",{"BusinessAreaCode"})
+				in
+				    #"Removed Columns1"
+
+	annotation PBI_ResultType = Table
+

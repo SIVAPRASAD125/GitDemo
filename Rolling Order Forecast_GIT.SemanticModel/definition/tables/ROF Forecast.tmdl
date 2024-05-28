@@ -1,0 +1,133 @@
+table 'ROF Forecast'
+	lineageTag: f3c130a6-80b7-4d99-b2a0-2f6179606b0d
+
+	column FiscalQuarter
+		dataType: string
+		lineageTag: fb08bc9d-bcb9-4c2b-99bb-ae7a3f82bc5d
+		summarizeBy: none
+		sourceColumn: FiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 153ac0c3-2981-40c6-9764-c794893b446b
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geography
+		dataType: string
+		lineageTag: 6bcce2f4-8c9c-47e7-88f8-2b484675a8a9
+		summarizeBy: none
+		sourceColumn: Geography
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: 68b90f18-45db-43ea-95f4-52f7b7107a24
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column BackLog
+		dataType: double
+		lineageTag: 2e1fb203-8ff7-40c4-b28b-32aa7fa3aff8
+		summarizeBy: sum
+		sourceColumn: BackLog
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column execBacklog
+		dataType: double
+		lineageTag: 1fca044a-c1b0-4614-9972-f7f6ef538c23
+		summarizeBy: sum
+		sourceColumn: execBacklog
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column GeoKey
+		dataType: string
+		lineageTag: f173be4e-3798-4399-b655-15d645c8f105
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: dbd19afa-06c2-40e6-9fb0-9b1c5564926a
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ColumnWeek
+		dataType: string
+		lineageTag: 50f5d12c-6a43-4594-a46e-e04629070ebb
+		summarizeBy: none
+		sourceColumn: ColumnWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		lineageTag: b02e4c15-2ba6-4755-b24d-d7b32c194dbe
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column = RELATED('Prod Master'[ProductKey])
+		dataType: string
+		lineageTag: 3d8c76cf-ff04-4230-87d6-69d2eea72fde
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clari/ROF
+		dataType: string
+		lineageTag: d59fc2d7-7aaf-41da-8537-bfccc23e994f
+		summarizeBy: none
+		sourceColumn: Clari/ROF
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Forecast Level' = IF('ROF Forecast'[Clari/ROF]="Unadjusted (Clari)",RELATED('Geo Master'[Clari Forecast Toggle]),"ROF Forecast")
+		dataType: string
+		lineageTag: 4d20c1e2-ecac-40cb-971b-8110ca6b5746
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'ROF Forecast-e4596ecb-ff4b-4dd9-a758-892308ac8241' = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"fact ROF_Forecast_Sheet" = Source{[Schema="fact",Item="ROF_Forecast"]}[Data],
+				    #"Removed Columns" = Table.RemoveColumns(#"fact ROF_Forecast_Sheet",{"CountryCode", "BusinessAreaCode", "Geo", "budget",  "id", "UpdatedBy", "UpdatedTime", "Total"}),
+				    #"Added Custom" = Table.AddColumn(#"Removed Columns", "Clari/ROF", each "ROF"),
+				    #"Appended Query" = Table.Combine({#"Added Custom", ROF_Clari_Final}),
+				    #"Unpivoted Other Columns" = Table.UnpivotOtherColumns(#"Appended Query", {"FiscalQuarter", "Region", "BU", "WeekNo", "GeoKey", "ProductKey", "BackLog", "execBacklog","Geography","Clari/ROF","DataType","Country"}, "ColumnWeek", "Value"),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Unpivoted Other Columns",{{"FiscalQuarter", type text}, {"Region", type text}, {"BU", type text}, {"WeekNo", type text}, {"GeoKey", type text}, {"ProductKey", type text}, {"ColumnWeek", type text}, {"Value", type number}, {"BackLog", type number}, {"execBacklog", type number}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Changed Type", each true),
+				    #"Filled Down" = Table.FillDown(#"Filtered Rows",{"FiscalQuarter"}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Filled Down",{"BU", "Country", "DataType"})
+				in
+				    #"Removed Columns1"
+
+	annotation PBI_ResultType = Table
+

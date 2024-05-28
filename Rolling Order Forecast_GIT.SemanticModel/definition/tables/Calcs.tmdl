@@ -1,0 +1,3890 @@
+table Calcs
+	lineageTag: 9268681a-580f-44c8-bf19-d9083ca30fc0
+
+	measure 'Forecast Value' =
+			
+			VAR DisplayValue =
+			SUMX(
+			    SUMMARIZE(
+			        'ROF Forecast',
+			        'ROF Forecast'[GeoKey],
+			        'ROF Forecast'[ProductKey],
+			        ColWkSorting[SortOrder],
+			        ColWkSorting[Weeks],
+			        RowWkSorting[Week],
+			        RowWkSorting[SortOrder],
+			        'ROF Forecast'[Value]
+			    ),
+			    'ROF Forecast'[Value]
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		lineageTag: 11f0e3b4-a418-404a-8e52-68085477acf4
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure BBL =
+			VAR DisplayValue =
+			SUMX(
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            'ROF Forecast',
+			            'ROF Forecast'[GeoKey],
+			            'ROF Forecast'[ProductKey]
+			        ),
+			        "MAXVal",
+			        CALCULATE(MAX('ROF Forecast'[BackLog]),ALL('ROF Forecast'[Clari/ROF]),ALL('ROF Forecast'[Forecast Level]))
+			    ),
+			    [MAXVal]
+			)
+			 Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: Other Measures
+		lineageTag: 63e5c741-0799-4eec-8aab-35cd569fb7f3
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure EBBL = ```
+			VAR DisplayValue =
+			SUMX(
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            'ROF Forecast',
+			            'Geo Master'[GeoKey],
+			            'Prod Master'[ProductKey]
+			        ),
+			        "MAXVal",
+			        CALCULATE(MAX('ROF Forecast'[execBacklog]),ALL('ROF Forecast'[Clari/ROF]),ALL('ROF Forecast'[Forecast Level]))
+			    ),
+			    [MAXVal]
+			)
+			Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		formatString: #,0.0
+		displayFolder: Other Measures
+		lineageTag: 6e36f19e-120b-4aae-beea-74d146d63ca3
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Order Budget Plan' =
+			VAR DisplayValue =
+			[Current Wk Forecast] - [Order Budget Plan]
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+		formatString: 0.0
+		displayFolder: "vs" Measures
+		lineageTag: 46f4105e-15a8-4506-9970-2bdf64d6c03b
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Order Budget Plan Cum' =
+			
+			CALCULATE(
+			    [vs Order Budget Plan],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: 0.0
+		displayFolder: "vs" Measures
+		lineageTag: d7ea09d3-f198-4df0-9942-1f474da5a44d
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Plan_M1' = ```
+			
+			VAR MonthValue = "M1"
+			VAR TaskOption = SELECTEDVALUE('Task Option'[Value])
+			VAR ConcatMonthValue = 
+			    IF(
+			        TaskOption = "W Task",
+			        MonthValue & "-Plan + Task",
+			        MonthValue & "-Plan"
+			    )
+			VAR MonthPlanTask = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]),
+			        KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			    )
+			VAR DisplayValue = [Current Wk Forecast] - MonthPlanTask
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			            IF(
+			                TaskOption = "W Task",
+			                MonthValue  ,
+			                MonthValue
+			            ),
+			            Result
+			        ),
+			        Result
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: "vs" Measures
+		lineageTag: 697eb34a-36b8-4616-a3dc-f71ea3269ab5
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Week Forecast' =
+			VAR DisplayValue =
+			 [Total C + U + LS] - [Forecast Value 1]
+			 VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: "vs" Measures
+		lineageTag: 9394e81f-9768-4399-9d92-d3d92672b02f
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure '% Executable' = ```
+			DIVIDE([EBBL], [BBL]) 
+			```
+		formatString: 0%;-0%;0%
+		lineageTag: 5570fb1f-9e7f-4684-8322-fc5c12b8acbc
+
+		changedProperty = IsHidden
+
+	measure 'vs Rev Flash' = ```
+			
+			VAR FlashTotal = [Revenue Flash]
+			VAR Cumu_W14_Actuals = 
+			    CALCULATE(
+			        [Forecast Value],
+			        FILTER(
+			            ALL(ColWkSorting),
+			            ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			        )
+			        ,
+			        KEEPFILTERS(RowWkSorting[Week] = "W13 + 1")
+			   )
+			RETURN
+			  DIVIDE(
+			        [EBBL] +
+			        Cumu_W14_Actuals -
+			        [Non Exec Cum],
+			        FlashTotal
+			    )
+			   
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: "vs" Measures
+		lineageTag: be25a23a-9392-4221-bfad-19f52de10cda
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Rev Budget' = ```
+			
+			VAR BudgetTotal = [Revenue Budget]
+			VAR Cumu_W14_Actuals = 
+			    CALCULATE(
+			        [Forecast Value],
+			        FILTER(
+			            ALL(ColWkSorting),
+			            ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			        )
+			        ,
+			       KEEPFILTERS(RowWkSorting[Week] = "W13 + 1")
+			    )
+			RETURN
+			
+			
+			 DIVIDE(
+			        [EBBL] +
+			        Cumu_W14_Actuals -
+			        [Non Exec Cum],
+			        BudgetTotal
+			    )
+			
+			
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: "vs" Measures
+		lineageTag: c955850c-6b2b-42f8-921c-ed9bbfe61a15
+
+		changedProperty = IsHidden
+
+	measure 'Dummy Metric' = "XX"
+		lineageTag: 61f7d5fd-acd9-4be9-9c42-972184455755
+
+		changedProperty = IsHidden
+
+	measure Dummy2 = 10^6
+		formatString: 0
+		lineageTag: aed8d21d-67bc-4254-94b3-0dd33b4ebca0
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Diagonal CF' =
+			
+			VAR CurrentRow = SELECTEDVALUE(RowWkSorting[SortOrder])
+			VAR CurrentCol = SELECTEDVALUE(ColWkSorting[SortOrder])
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        --SELECTEDVALUE(ColWkSorting[IsCurrentWeek]) = "TRUE", "#CAE4EB",
+			        CurrentRow >= CurrentCol && CurrentCol <> BLANK() && CurrentRow <> BLANK(), "#D9D9D9"
+			    )
+		lineageTag: 1c4b9da4-1b68-4468-937a-0405d6d9021a
+
+		changedProperty = IsHidden
+
+	measure 'CurrentWeek CFFont' =
+			
+			SWITCH(
+			    TRUE(),
+			    SELECTEDVALUE(ColWkSorting[IsCurrentWeek]) = "TRUE", "#000000"
+			)
+		lineageTag: 067c4b4d-47f5-416a-b5df-c8e2c15e1f5c
+
+		changedProperty = IsHidden
+
+	measure 'CurrentWeek CF' =
+			
+			SWITCH(
+			    TRUE(),
+			    SELECTEDVALUE(ColWkSorting[IsCurrentWeek]) = "TRUE", "#CAE4EB"
+			)
+		lineageTag: 7bf6b46e-ac19-4872-b615-4932c8a8957d
+
+		changedProperty = IsHidden
+
+	measure 'Non Exec Cum' =
+			VAR DisplayValue =
+			CALCULATE(
+			    [Non Exec Total],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+			Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: Other Measures
+		lineageTag: 5f42d24e-fa57-4114-a8f5-a913f65f59cb
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Non Exec Total' =
+			
+			VAR DisplayValue =calculate(SUM('Non Executable'[Value]),'Non Executable'[MonthPlan]="M1")
+			Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+		formatString: 0.0
+		displayFolder: Other Measures
+		lineageTag: 7c16e0e8-b69b-41d0-808d-34b8906d2ff1
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure Commit = ```
+			VAR DisplayValue =
+			CALCULATE(
+			    [Total Revenue],
+			    KEEPFILTERS('Pipeline'[ForecastCategory] = "Commit" )
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			
+			
+			```
+		formatString: #,0.0
+		displayFolder: Pipeline Measures
+		lineageTag: 2688cdb9-75f7-48b9-9f42-f93802387c62
+
+		changedProperty = IsHidden
+
+	measure 'Late Stage (SS 4-5)' =
+			VAR DisplayValue =
+			    CALCULATE(
+			        [Total Revenue],
+			        KEEPFILTERS( 'Pipeline'[ForecastCategory] = "Pipeline LS" )
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: Pipeline Measures
+		lineageTag: 2228a810-95ef-48ca-b05a-ab7432d24427
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Total C + U + LS' =
+			VAR DisplayValue = CALCULATE(
+			    [Total Revenue], 'Pipeline'[ForecastCategory] IN{ "Upside","Commit","Pipeline LS"} )
+			--[Commit] + [Late Stage (SS 4-5)] + [Upside]
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			--CONVERT(FORMAT(DisplayValue,"0.0"),DOUBLE),
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: Pipeline Measures
+		lineageTag: 5170b69e-c685-4d1a-9bd5-88c7b136d3d5
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Total Revenue' = DIVIDE(SUM(Pipeline[Revenue]), 10^6)
+		formatString: 0.0
+		lineageTag: 3e8590bb-4aca-4097-9df4-bd637732cc06
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure Upside =
+			VAR DisplayValue =
+			CALCULATE(
+			    [Total Revenue],
+			    KEEPFILTERS( 'Pipeline'[ForecastCategory] = "Upside" )
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: Pipeline Measures
+		lineageTag: 4e320a37-b3d7-4d2c-8e68-ce7e2035be53
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Plan + Task_M1' = ```
+			
+			VAR MonthValue ="M1"
+			VAR ConcatMonthValue = MonthValue & "-Plan + Task"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]), FILTER('ROF OrderPlan', 'ROF OrderPlan'[Plan]= ConcatMonthValue)
+			       /* KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)*/
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"))) 
+			RETURN
+			IF(
+			    ISINSCOPE(ColWkSorting[Weeks]),
+			    IF(
+			        SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			      LEFT(ConcatMonthValue,2),IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			      --LEFT(ConcatMonthValue,2),IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        
+			    ),
+			    Result
+			)
+			```
+		formatString: #,0.0
+		lineageTag: 25cf3957-e93a-4ad9-b423-7b9bbd34cdc4
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Order Budget Plan' =
+			
+			--CALCULATE(
+			  VAR Displayvalue =   SUM('ROF BudgetPlan'[BudgetPlanValue])--,
+			    --'ROF OrderPlan'[Plan] = "M1-Plan"
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			--)
+			Return
+			IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			--IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			           Result)
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: e5ab2f12-0c39-489a-a1d4-484ab43a9f0a
+
+		changedProperty = IsHidden
+
+	measure 'M1 EOP Value' = ```
+			
+			VAR CurrentMonth = "M1"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM(EOP[EOPValue]),FILTER(EOP,EOP[MonthPlan]=CurrentMonth)
+			        /*KEEPFILTERS(EOP[MonthPlan] = CurrentMonth*/
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			             CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			             --CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        ),
+			      Result
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: f2174487-84fd-42e6-9d59-34e1a62bebdc
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Revenue Flash' =
+			VAR DisplayValue = SUM(FlashBudget[Flash])
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: bb9ff2e7-9992-4f82-8d19-bafd81a0a2ca
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Revenue Budget' = ```
+			VAR DisplayValue = SUM(FlashBudget[Budget])
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: 51525b0e-bf59-459c-abab-4a9e353ad5c2
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure EBBL+CumAct-CumNonExeOrders = ```
+			
+			VAR Cumu_W14_Actuals = 
+			CALCULATE(
+			[Forecast Value],
+			FILTER(
+			ALL(ColWkSorting),
+			ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			)
+			,
+			KEEPFILTERS(RowWkSorting[Week] = "W13 + 1")
+			)
+			RETURN
+			([EBBL] +Cumu_W14_Actuals) -[Non Exec Cum]
+			
+			/*
+			VAR Cumu_W14_Actuals = 
+			CALCULATE(
+			[Forecast Value],
+			FILTER(
+			ALL(ColWkSorting),
+			ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			)
+			,
+			KEEPFILTERS(RowWkSorting[Week] = "W11 + 3")
+			)
+			RETURN
+			([EBBL] +Cumu_W14_Actuals) -[Non Exec Cum]
+			*/
+			```
+		formatString: #,0.0
+		lineageTag: 31106aab-33cf-454a-be1a-75ab57d85809
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Current Wk Forecast' = ```
+			
+			
+			CALCULATE(
+			    [Forecast Value],
+			    KEEPFILTERS(RowWkSorting[IsCurrentWeek] = "TRUE")
+			)
+			
+			
+			
+			```
+		formatString: #,0.0
+		lineageTag: 9674cb1b-8adc-4d7f-ae81-3a33d67dae99
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'CF Arrows' = ```
+			
+			VAR M1Plan = [M1_M2_M3 MIX]
+			VAR CurrRowWk = SELECTEDVALUE(RowWkSorting[SortOrder])
+			VAR CurrColWk = SELECTEDVALUE(ColWkSorting[SortOrder])
+			
+			VAR CurrentWeek =CALCULATE([Forecast Value], 
+			                    FILTER('ROF Forecast',
+			                        CurrColWk = CurrRowWk
+			                        )
+			                )
+			
+			// VAR PrevWeek = // CALCULATE(
+			// [Forecast Value],
+			// FILTER(
+			// ALL(ColWkSorting),
+			// ColWkSorting[SortOrder] = CurrColWk - 1
+			// ),
+			// FILTER(
+			// ALL(RowWkSorting),
+			// RowWkSorting[SortOrder] = CurrRowWk - 1
+			// )
+			// )
+			
+			RETURN
+			IF(
+			    CurrColWk = CurrRowWk,
+			        SWITCH(
+			            TRUE(),
+			                CurrentWeek > M1Plan, 1,
+			                CurrentWeek = M1Plan, 2,
+			                3
+			)
+			)
+			```
+		formatString: 0
+		lineageTag: 6d5c39bc-303f-4c89-9b77-7b6a18af224e
+
+		changedProperty = IsHidden
+
+	measure Orders = ```
+			
+			VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR DisplayValue = 
+			    CALCULATE(
+			        [Forecast Value],
+			        KEEPFILTERS(RowWkSorting[IsCurrentWeek] = "TRUE"), 
+			        KEEPFILTERS(ColWkSorting[Open/Close] = "Close" || ColWkSorting[IsCurrentWeek]="True" && VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y"),
+			        KEEPFILTERS('ROF Forecast'[Clari/ROF] = "ROF")
+			
+			    )
+			  VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            Result
+			        ),
+			        Result
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: 42a902cf-fa25-4126-8dc0-09fdbb79aab6
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Cum Orders' = ```
+			
+			VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR ValueDisplayed = 
+			    IF(
+			        [Orders]<> BLANK(),
+			        CALCULATE(
+			            [Forecast Value],
+			            KEEPFILTERS(RowWkSorting[IsCurrentWeek] = "TRUE"), 
+			            KEEPFILTERS(ColWkSorting[Open/Close] = "Close" ||ColWkSorting[IsCurrentWeek]="True" && VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y"),
+			            KEEPFILTERS('ROF Forecast'[Clari/ROF] = "ROF"),
+			            FILTER(
+			                ALL(ColWkSorting),
+			                ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			            )
+			        )
+			    )
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            ValueDisplayed
+			        ),
+			        ValueDisplayed
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: ee5d2cf4-601a-4bc5-9d76-c701c7a35abd
+
+		changedProperty = IsHidden
+
+	measure 'M1_M2_M3 MIX' = ```
+			
+			VAR M1 = 
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W2","W3","W4","W5"}
+			    )
+			VAR M2 =  IF( [M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W6","W7","W8","W9"}
+			  ),CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W6","W7","W8","W9"}))
+			VAR M3 = IF([M3 Order Plan+Task]=0,
+			            IF([M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W10","W11","W12","W13"}),
+			    
+			    CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W10","W11","W12","W13"})),
+			       
+			    CALCULATE(
+			        [M3 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W10","W11","W12","W13"}
+			    ))
+			VAR DisplayValue =M1+M2+M3
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"),INTEGER)))
+			RETURN
+			Result
+			    -- M1+M2+M3
+			
+			/*VAR M1 = 
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W3","W4","W5","W6"}
+			    )
+			VAR M2 =  IF( [M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W7","W8","W9","W10"}
+			  ),CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W7","W8","W9","W10"}))
+			VAR M3 = IF([M3 Order Plan+Task]=0,
+			            IF([M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W11","W12","W13","W13-1"}),
+			    
+			    CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W11","W12","W13","W13-1"})),
+			       
+			    CALCULATE(
+			        [M3 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W11","W12","W13","W13-1"}
+			    ))
+			VAR DisplayValue =M1+M2+M3
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"),INTEGER)))
+			RETURN
+			Result
+			    -- M1+M2+M3
+			    */
+			
+			```
+		formatString: #,0.0
+		lineageTag: 4497fe3f-ab00-4624-bc5a-9d1bb151d713
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'V/S Order Plan' =
+			
+			IFERROR(
+			    DIVIDE(
+			        [Orders],
+			        [M1_M2_M3 MIX]
+			    ),
+			    BLANK()
+			)
+		formatString: 0%;-0%;0%
+		lineageTag: d327dde2-f327-4bb0-88f2-3d1b1698ef54
+
+		changedProperty = IsHidden
+
+	measure 'V/S Cum Order Plan' =
+			
+			IFERROR(
+			    DIVIDE(
+			        [Cum Orders],
+			        [Cum M1_M2_M3]
+			    ),
+			    BLANK()
+			)
+		formatString: 0%;-0%;0%
+		lineageTag: fc887951-0c41-489a-b4eb-97fcbe4c62e6
+
+		changedProperty = IsHidden
+
+	measure 'M1 Order Plan+Task' = ```
+			VAR DisplayValue =
+			CALCULATE(
+			    SUM('ROF OrderPlan'[OrderPlanValue]),
+			    'ROF OrderPlan'[Plan] = "M1-Plan + Task"
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    Return
+			    Result
+			```
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: 82d89356-4fb3-4a24-8997-12cc7554b8d7
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'M2 Order Plan+Task' = ```
+			VAR DisplayValue =
+			CALCULATE(
+			    SUM('ROF OrderPlan'[OrderPlanValue]),
+			    'ROF OrderPlan'[Plan] = "M2-Plan + Task"
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    Return
+			 Result
+			```
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: db22a4ef-3640-4651-b53c-103e4b3ade95
+
+		changedProperty = IsHidden
+
+	measure 'M3 Order Plan+Task' = ```
+			VAR DisplayValue =
+			CALCULATE(
+			    SUM('ROF OrderPlan'[OrderPlanValue]),
+			    'ROF OrderPlan'[Plan] = "M3-Plan + Task"
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    Return
+			    Result
+			```
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: bd24deee-0914-4a6d-8394-f01f0fe9cec7
+
+		changedProperty = IsHidden
+
+	measure 'V/S M1 Plan Cum' = ```
+			VAR DisplayValue =
+			CALCULATE(
+			    CALCULATE(
+			        [Current Wk Forecast]-[M1 Order Plan+Task],
+			        'ROF Forecast'[Clari/ROF]="ROF"
+			    ),
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    Return
+			    Result
+			```
+		formatString: #,0.0
+		lineageTag: 45b04301-84ba-4a80-af75-6ebc2fa2caa6
+
+		changedProperty = IsHidden
+
+	measure 'V/S M2 Plan Cum' = ```
+			VAR DisplayValue = IF([M2 Order Plan+Task]=0,0,
+			CALCULATE(
+			    CALCULATE(
+			        [Current Wk Forecast]-[M2 Order Plan+Task],
+			    'ROF Forecast'[Clari/ROF]="ROF"
+			    ),
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			))
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"))) 
+			    Return
+			    Result
+			```
+		formatString: #,0.0
+		lineageTag: b2a69c65-f7c5-4cc1-a3fa-ea4489e545ea
+
+		changedProperty = IsHidden
+
+	measure 'V/S M3 Plan Cum' = ```
+			
+			 VAR DisplayValue = IF([M3 Order Plan+Task]=0,0,
+			CALCULATE(
+			    CALCULATE(
+			        [Current Wk Forecast]-[M3 Order Plan+Task],
+			    'ROF Forecast'[Clari/ROF]="ROF"
+			    ),
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			))
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"))) 
+			    Return
+			    Result
+			 
+			 
+			 
+			 
+			 
+			 
+			 
+			 /*
+			 Var TaskOption = BLANK()  Var Monthvalue = BLANK()
+			vAR Displayvalue = CALCULATE( If([M3 Order Plan+Task] =0 , 0,
+			    CALCULATE(
+			        [Forecast Value]-[M3 Order Plan+Task],
+			        RowWkSorting[SortOrder] = 13
+			    )),
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"))) 
+			Return 
+			 IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			            IF(
+			                TaskOption ,
+			                MonthValue,
+			                MonthValue
+			            ),
+			            Result
+			        ),
+			        Result
+			    )*/
+			   	/*
+			Var TaskOption = BLANK()  Var Monthvalue = BLANK()
+			vAR Displayvalue = CALCULATE( If([M3 Order Plan+Task] =0 , 0,
+			    CALCULATE(
+			        [Forecast Value]-[M3 Order Plan+Task],
+			        RowWkSorting[SortOrder] = 14
+			    )),
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"))) 
+			Return 
+			 IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			            IF(
+			                TaskOption ,
+			                MonthValue,
+			                MonthValue
+			            ),
+			            Result
+			        ),
+			        Result
+			    )
+			   	
+			    */
+			
+			```
+		formatString: #,0.0
+		lineageTag: 8c926efb-337a-467d-a547-60c031713a13
+
+		changedProperty = IsHidden
+
+	measure 'QTD v/s Plan' =
+			
+			VAR DisplayValue =
+			[Orders] - [M1_M2_M3 MIX]
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+		formatString: #,0.0
+		lineageTag: 3963c1d8-7a7b-410b-b310-be02e7e860c7
+
+		changedProperty = IsHidden
+
+	measure Blank
+		lineageTag: 0b633f85-032b-42f7-807e-964f18bf4d8f
+
+		changedProperty = IsHidden
+
+	measure Won = ```
+			VAR DisplayValue =
+			DIVIDE(
+			    CALCULATE(
+			        SUM('Pipeline'[Revenue]),
+			        KEEPFILTERS(Pipeline[ForecastCategory] = "Won")
+			    ), 
+			    10^6
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"))) 
+			    Return
+			    Result
+			```
+		formatString: #,0.0
+		displayFolder: Pipeline Measures
+		lineageTag: 55cd5206-aa5f-4789-8290-80b1ef0c1047
+
+		changedProperty = IsHidden
+
+	measure 'Total Funnel' =
+			VAR DisplayValue =
+			
+			    [Total Revenue]
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			
+			
+			--[Won] + [Commit] + [Upside] + [Late Stage (SS 4-5)] + [Early Stage (SS 1-3)]
+		formatString: #,0.0
+		displayFolder: Pipeline Measures
+		lineageTag: 21d78030-0fe8-4931-99cc-2477f2655fe0
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Cum M1_M2_M3' =
+			
+			CALCULATE(
+			    [M1_M2_M3 MIX],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: 0.0
+		lineageTag: 60a7f3d4-c3c0-4595-b1f7-ca331f645428
+
+		changedProperty = IsHidden
+
+	measure 'Total ROF Pipeline Detailed' = ```
+			CALCULATE(SUM('ROF Pipeline'[Value]),ALL('Prod Master'))
+			
+			--DIVIDE(SUM('ROF Pipeline'[Value]),10^6)
+			 
+			 --CALCULATE(SUM('ROF Pipeline'[Value]),ALL('Prod Master'))
+			
+			```
+		lineageTag: 95720c01-f8ac-4e42-b27a-451bcd4c1f98
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Forecast Value 1' =
+			
+			CALCULATE(SUM('ROF Forecast'[Value]),FILTER('ROF Forecast','ROF Forecast'[WeekNo]="W13 + 1"))
+		lineageTag: 0250b807-5493-49a0-8af5-da13fb6dade0
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Curr Week Single Value' = ```
+			
+			VAR InflightWeekNo = MAX('rpt dim_current_date_rof'[fiscal_week]) 
+			VAR InflightWeekForecast=
+			        CALCULATE(
+			             [Forecast Value],
+			                 RowWkSorting[SortOrder] = InflightWeekNo -1,
+			                 ColWkSorting[SortOrder] = InflightWeekNo,
+			                'ROF Forecast'[Clari/ROF]="ROF"
+			        )
+			VAR Displayvalue = InflightWeekForecast
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(Displayvalue,INTEGER)))
+			
+			RETURN Result
+			```
+		formatString: #,0.0
+		lineageTag: 29b3ceef-da08-4dc6-ae81-fc69d1205ce5
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'WTD Orders' = ```
+			
+			VAR InflightWeek = [Inflight Wk]
+			VAR CumCurrWk = 
+			    CALCULATE(
+			        SUM('Load Bookings'[Bookings]) / 10^6,
+			        ColWkSorting[Weeks] = InflightWeek
+			    )
+			VAR CumLastWk = 
+			    VAR LastWkValue = 
+			        CALCULATE(
+			            SELECTEDVALUE(ColWkSorting[SortOrder]) - 1,
+			            ColWkSorting[Weeks] = InflightWeek
+			        )
+			    VAR BookingValue = 
+			        CALCULATE(
+			            SUM('Load Bookings'[Bookings]) / 10^6,
+			            ColWkSorting[SortOrder] = LastWkValue
+			        )
+			    RETURN
+			        BookingValue
+			RETURN
+			    CumCurrWk - CumLastWk
+			```
+		formatString: 0.0
+		lineageTag: aee655dc-a25a-4a03-9be0-4122778aa164
+
+		changedProperty = IsHidden
+
+	measure 'Inflight Wk' = ```
+			CONCATENATE("W",(MAX('rpt dim_current_date_rof'[fiscal_week])))
+			--CALCULATE(
+			 --   selectedvalue('ColWkSorting'[Weeks]),
+			 --   ColWkSorting[IsCurrentWeek] = "TRUE"
+			--)
+			
+			```
+		lineageTag: c708da0b-fc3d-488d-9c8e-060d1f2b8dd4
+
+		changedProperty = IsHidden
+
+	measure WTD/Day = ```
+			
+			VAR DayToday = FORMAT(TODAY(), "ddd")
+			VAR DaysPassed = 
+			    CALCULATE(
+			        SELECTEDVALUE( 'Days Table'[Number] ),
+			        'Days Table'[Day] = DayToday
+			    )
+			    VAR DisplayValue = DIVIDE(
+			        CALCULATE([WTD Orders]),
+			        DaysPassed
+			    )
+			    VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    Result
+			
+			/* VAR DisplayValue = DIVIDE(
+			        CALCULATE([WTD Orders],USERELATIONSHIP('Prod Bridge'[ProductKey],'Load Bookings'[ProductKey]),USERELATIONSHIP('Geo Bridge'[GeoKey],'Load Bookings'[GeoKey]),'Load Bookings'[FinancialOrderFlag]="Y"),
+			        DaysPassed
+			        */
+			```
+		formatString: 0.0
+		lineageTag: cd45803c-5a93-43e2-8785-33a58c9d31b0
+
+		changedProperty = IsHidden
+
+	measure WTDToGo/Day = ```
+			VAR DayToday = FORMAT(TODAY(), "ddd")
+			VAR DaystoGo= 
+			    CALCULATE(
+			        SELECTEDVALUE( 'Days Table'[To Go] ),
+			        'Days Table'[Day] = DayToday
+			    )
+			    VAR DisplayValue = DIVIDE(
+			   [Delta] * - 1,
+			   DaystoGo
+			)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			Result
+			    
+			```
+		formatString: #,0.0
+		lineageTag: 251442b9-72ad-44ba-894f-c43889cad8fa
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure Delta = ```
+			VAR DisplayValue =
+			[WTD Orders 1] - [Curr Week Single Value]
+			 Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		formatString: 0.0
+		lineageTag: 99e91ee9-a699-4309-9082-90e3fb97a250
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Flash w/o BBL' = IF([Revenue Flash]=0,0, Calcs[Cum Actuals]-[Non Exec Cum])/[Revenue Flash]
+		formatString: 0%;-0%;0%
+		displayFolder: "vs" Measures
+		lineageTag: f4c6e5a4-eb90-4688-b85f-33e603dce672
+
+		changedProperty = IsHidden
+
+	measure 'Plan + Task_M2' = ```
+			
+			VAR MonthValue ="M2"
+			VAR ConcatMonthValue = MonthValue & "-Plan + Task"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]), FILTER('ROF OrderPlan', 'ROF OrderPlan'[Plan]= ConcatMonthValue)
+			       /* KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)*/
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			RETURN
+			IF(
+			    ISINSCOPE(ColWkSorting[Weeks]),
+			    IF(
+			        SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			      LEFT(ConcatMonthValue,2),IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			      --LEFT(ConcatMonthValue,2),IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        
+			    ),
+			    Result
+			)
+			```
+		formatString: #,0.0
+		lineageTag: 4a57ede4-c448-431e-bf92-f147c72f2655
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Plan + Task_M3' = ```
+			
+			VAR MonthValue ="M3"
+			VAR ConcatMonthValue = MonthValue & "-Plan + Task"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]), FILTER('ROF OrderPlan','ROF OrderPlan'[Plan]=ConcatMonthValue)
+			        /*KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)*/
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(DisplayValue,"0")))   
+			RETURN
+			IF(
+			    ISINSCOPE(ColWkSorting[Weeks]),
+			    IF(
+			        SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			      LEFT(ConcatMonthValue,2),IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			      --LEFT(ConcatMonthValue,2),IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        
+			    ),
+			    Result
+			)
+			```
+		formatString: #,0.0
+		lineageTag: 3f1013c9-8c2f-4049-abdc-75ce0dbc05e3
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'M2 EOP Value' = ```
+			
+			VAR CurrentMonth = "M2"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM(EOP[EOPValue]),FILTER(EOP,EOP[MonthPlan]=CurrentMonth)
+			        /*KEEPFILTERS(EOP[MonthPlan] = CurrentMonth*/
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),BLANK(),DisplayValue),"#,0")))   
+			    RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			             CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			             --CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        ),
+			      Result
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: Target Measures
+		lineageTag: 6359fa17-d42c-46d4-9b23-cfde5301df04
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'M3 EOP Value' = ```
+			
+			VAR CurrentMonth = "M3"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM(EOP[EOPValue]),FILTER(EOP,EOP[MonthPlan]=CurrentMonth)
+			        /*KEEPFILTERS(EOP[MonthPlan] = CurrentMonth*/
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))  
+			    RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			             CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			             --CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        ),
+			      Result
+			    )
+			```
+		displayFolder: Target Measures
+		lineageTag: 1551d637-2e7d-48b4-b712-a5ba57099738
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'vs Plan_M2' = ```
+			
+			VAR MonthValue = "M2"
+			VAR TaskOption = SELECTEDVALUE('Task Option'[Value])
+			VAR ConcatMonthValue = 
+			    IF(
+			        TaskOption = "W Task",
+			        MonthValue & "-Plan + Task",
+			        MonthValue & "-Plan"
+			    )
+			VAR MonthPlanTask = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]),
+			        KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			    )
+			VAR DisplayValue = IF([Plan + Task_M2]=0,0, [Current Wk Forecast] - MonthPlanTask)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			            IF(
+			                TaskOption = "W Task",
+			                MonthValue,
+			                MonthValue
+			            ),
+			            Result
+			        ),
+			        Result
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: "vs" Measures
+		lineageTag: 84069584-d9d0-49b1-97fa-11fe0af9498f
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Plan Cum_M1' = ```
+			
+			VAR MonthValue = "M1"
+			VAR TaskOption = SELECTEDVALUE('Task Option'[Value])
+			VAR ConcatMonthValue = 
+			    IF(
+			        TaskOption = "W Task",
+			        MonthValue & "-Plan + Task",
+			        MonthValue & "-Plan"
+			    )
+			VAR MonthPlanTask = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]),
+			        KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			    )
+			VAR DisplayValue = 
+			    CALCULATE(
+			        [Current Wk Forecast] 
+			        - 
+			        CALCULATE(
+			            SUM('ROF OrderPlan'[OrderPlanValue]),
+			            KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			        ),
+			        FILTER(
+			            ALL(ColWkSorting),
+			            ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			        )
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))    
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			            IF(
+			                TaskOption = "W Task",
+			                MonthValue,
+			                MonthValue
+			            ),
+			        Result
+			        ),
+			        Result
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: "vs" Measures
+		lineageTag: 3987e854-0af9-4d19-92dd-c4bfe83caeb2
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Plan Cum_M2' = ```
+			
+			VAR MonthValue = "M2"
+			VAR TaskOption = SELECTEDVALUE('Task Option'[Value])
+			VAR ConcatMonthValue = 
+			    IF(
+			        TaskOption = "W Task",
+			        MonthValue & "-Plan + Task",
+			        MonthValue & "-Plan"
+			    )
+			VAR MonthPlanTask = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]),
+			        KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			    )
+			VAR DisplayValue = IF([Plan + Task_M2]=0,0,
+			    CALCULATE(
+			        [Current Wk Forecast] 
+			        - 
+			        CALCULATE(
+			            SUM('ROF OrderPlan'[OrderPlanValue]),
+			            KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			        ),
+			        FILTER(
+			            ALL(ColWkSorting),
+			            ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			        )
+			    ))
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			            IF(
+			                TaskOption = "W Task",
+			                MonthValue ,
+			                MonthValue
+			            ),
+			        Result
+			        ),
+			        Result
+			    )
+			```
+		formatString: #,0.0
+		displayFolder: "vs" Measures
+		lineageTag: c6171391-f1af-488c-86e4-2736e1afe49d
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Plan_M3' = ```
+			
+			VAR MonthValue = "M3"
+			VAR TaskOption = SELECTEDVALUE('Task Option'[Value])
+			VAR ConcatMonthValue = 
+			    IF(
+			        TaskOption = "W Task",
+			        MonthValue & "-Plan + Task",
+			        MonthValue & "-Plan"
+			    )
+			VAR MonthPlanTask = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]),
+			        KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			    )
+			VAR DisplayValue = IF([Plan + Task_M3]=0,0, [Current Wk Forecast] - MonthPlanTask)
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = "W10",0,
+			            IF(SELECTEDVALUE(ColWkSorting[Weeks]) = Blank(),  MonthValue,Result
+			            )
+			        ),
+			        Result
+			    )
+			```
+		formatString: 0.0
+		displayFolder: "vs" Measures
+		lineageTag: 64192f3d-cb04-4521-8c0d-877e06542593
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Plan Cum_M3' = ```
+			
+			VAR MonthValue = "M3"
+			VAR TaskOption = SELECTEDVALUE('Task Option'[Value])
+			VAR ConcatMonthValue = 
+			    IF(
+			        TaskOption = "W Task",
+			        MonthValue & "-Plan + Task",
+			        MonthValue & "-Plan"
+			    )
+			VAR MonthPlanTask = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]),
+			        KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			    )
+			VAR DisplayValue = IF([Plan + Task_M3]=0,0,
+			    CALCULATE(
+			        [Current Wk Forecast] 
+			        - 
+			        CALCULATE(
+			            SUM('ROF OrderPlan'[OrderPlanValue]),
+			            KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			        ),
+			        FILTER(
+			            ALL(ColWkSorting),
+			            ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			        )
+			    ))
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = "W10",0,
+			            IF(SELECTEDVALUE(ColWkSorting[Weeks]) = Blank(),  MonthValue,Result
+			            )
+			        ),
+			        Result
+			    )
+			
+			
+			
+			```
+		formatString: #,0.0
+		displayFolder: "vs" Measures
+		lineageTag: a23bffe1-17ee-4bbe-b599-127fbafd2a80
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Cum Actuals' =
+			
+			CALCULATE(
+			[Forecast Value],
+			FILTER(
+			ALL(ColWkSorting),
+			ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			)
+			,
+			KEEPFILTERS(RowWkSorting[Week] = "W13 + 1")
+			)
+		lineageTag: c36b199c-3762-45e1-8f59-9773c897862a
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'EOP Value' =
+			
+			
+			Var M1=[M1 EOP Value]
+			Var M2= If([M2 EOP Value]=BLANK(),M1,[M2 EOP Value])
+			Var M3=If([M3 EOP Value]=BLANK(),M2,[M3 EOP Value])
+			Return
+			IF("W"& MAX('rpt dim_current_date_rof'[fiscal_week]) IN {"W2","W3","W4","W5"},M1,
+			IF("W"& MAX('rpt dim_current_date_rof'[fiscal_week]) IN {"W6","W7","W8","W9"},M2,M3))
+			--IF("W"& MAX('rpt dim_current_date'[fiscal_week]) IN {"W11","W12","W13","W13-1"},M3)))
+		formatString: #,0.0
+		lineageTag: 9ce76a86-346e-4bf0-b09a-c728be7509fa
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'vs Plan_M3_Test' = ```
+			
+			VAR MonthValue = "M3"
+			VAR TaskOption = SELECTEDVALUE('Task Option'[Value])
+			VAR ConcatMonthValue = 
+			    IF(
+			        TaskOption = "W Task",
+			        MonthValue & "-Plan + Task",
+			        MonthValue & "-Plan"
+			    )
+			VAR MonthPlanTask = 
+			    CALCULATE(
+			        SUM('ROF OrderPlan'[OrderPlanValue]),
+			        KEEPFILTERS('ROF OrderPlan'[Plan] = ConcatMonthValue)
+			    )
+			VAR DisplayValue = IF((MonthPlanTask= 0 ) || (MonthPlanTask= BLANK())  , 0, [Current Wk Forecast]  - MonthPlanTask)
+			RETURN MonthPlanTask
+			  /* IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			            IF(
+			                TaskOption = "W Task",
+			                MonthValue,
+			                MonthValue
+			            ),
+			            DisplayValue
+			        ),
+			        DisplayValue
+			    ) */
+			   
+			```
+		lineageTag: 28a52aea-c5c4-485b-bd89-f2bdd79e427a
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Early Stage (SS 1-3)' =
+			VAR DisplayValue =
+			    CALCULATE(
+			        [Total Revenue],
+			        KEEPFILTERS( 'Pipeline'[ForecastCategory] = "Pipeline ES" )
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: Pipeline Measures
+		lineageTag: 28c5641a-4e55-42c3-8ed0-40f4ed5327ea
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Deal Based Indirect' = ```
+			
+			 VAR DisplayValue = CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType]="Deal Based Indirect")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			   
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: e0abb187-4976-4370-817b-65193f630aa3
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Clari Forecast Value' = ```
+			
+			SUMX(
+			    SUMMARIZE(
+			        'ROF_Clari_Final_Split',
+			        'ROF_Clari_Final_Split'[GeoKey],
+			        'ROF_Clari_Final_Split'[ProductKey],
+			        ColWkSorting[SortOrder],
+			        ColWkSorting[Weeks],
+			        RowWkSorting[Week],
+			        RowWkSorting[SortOrder],
+			        'ROF_Clari_Final_Split'[Value]
+			    ),
+			    'ROF_Clari_Final_Split'[Value]
+			)
+			
+			
+			```
+		formatString: #,0.0
+		lineageTag: bb2c2e5e-8430-4d00-8ebe-ae06c734da17
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Total Judgement' =
+			
+			VAR DisplayValue = CALCULATE(Calcs[Clari Forecast Value],RowWkSorting[IsCurrentWeek]="TRUE")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: f52833e8-9d18-400a-836f-81e4e167359f
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Deal Based Direct' = ```
+			
+			   VAR DisplayValue =  CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType]="Deal Based Direct")
+			    VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+			
+			/*VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE")
+			VAR Valuedisplayed =*/
+			/*RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            Valuedisplayed
+			        ),
+			        Valuedisplayed
+			    )*/
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: bb510e54-a3ea-4231-a127-84fcd6ed4c57
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Deal Based' = ```
+			VAR DisplayValue =  CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType] in {"Deal Based Direct","Deal Based Indirect"})
+			    VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+			
+			
+			
+			--[Deal Based Direct]+[Deal Based Indirect]
+			  
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: 79299663-9f00-4613-bf3a-a1e24c0c96de
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Judge Down (Non Deal)' = ```
+			
+			VAR DisplayValue = CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType]="Judge Down")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: 2569e773-b305-47fa-893c-9a4cc02f989f
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Run Rate (Non Deal)' = ```
+			
+			  VAR DisplayValue = CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType]="Run Rate")
+			  VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			 
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: d700bb6e-e50c-456d-ac2a-da9fd685b5b7
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Stretch (Non Deal)' = ```
+			
+			VAR DisplayValue = CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType]="Stretch")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: 9756f7a1-436a-4a3e-92d1-2dea18912706
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Task (Non Deal)' = ```
+			
+			VAR DisplayValue = CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType]="Task")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: 69b8cd6a-c26b-4296-a633-8280f8879820
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Non Deal Based' = ```
+			VAR DisplayValue = CALCULATE(Calcs[Total Judgement],ROF_Clari_Final_Split[ForecastEntryType] in {"Run Rate","Stretch","Task","Judge Down"})
+			  VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			 --[Judge Down (Non Deal)]+[Run Rate (Non Deal)]+[Stretch (Non Deal)]+[Task (Non Deal)]
+			
+			```
+		formatString: #,0.0
+		displayFolder: Clari Detailed Measures
+		lineageTag: 52a14dbd-f342-42c2-8f27-b8b6d8d69bd9
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Curr Wk Forecast ROF' = ```
+			
+			VAR DisplayValue = CALCULATE([Current Wk Forecast],'ROF Forecast'[Clari/ROF]="ROF")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+			
+			```
+		formatString: #,0.0
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: b4041641-ec76-46aa-abfa-e9120eb57db9
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'SC_Prior WK Fcst' = ```
+			VAR CurrWeek = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[SortOrder]) ,
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR PrevWeekDisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[SortOrder] = CurrWeek - 1
+			    )
+			VAR ValueDisplayed = 
+			    CALCULATE(
+			        [Forecast Value],
+			        RowWkSorting[SortOrder] = CurrWeek - 1
+			    )
+			RETURN
+			IF(
+			    ISINSCOPE(ColWkSorting[Weeks]),
+			    IF(
+			        SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			        PrevWeekDisplayed,
+			        ValueDisplayed
+			    ),
+			    ValueDisplayed
+			)
+			```
+		formatString: #,0.0
+		lineageTag: 623c363c-4780-4567-bf54-9d8de2b8e701
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'SC_ Cumu Pre WK Forecast' =
+			
+			CALCULATE(
+			    [SC_Prior WK Fcst],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: #,0.0
+		lineageTag: 4e12ac55-d6b3-4e12-82e0-35f8d7f0f713
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'SC_Cumu VS Prior Wk Fcst' = ```
+			
+			 VAR DisplayValue = CALCULATE(
+			           [vsPriorwkforecasttable],
+			            
+			            FILTER(
+			                ALL(ColWkSorting),
+			                ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			            )
+			        )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(if(DisplayValue=BLANK(),0,DisplayValue),"0"))) 
+			
+			    Return
+			    Result
+			
+			
+			
+			```
+		formatString: 0.0
+		lineageTag: 04d562d5-e1f3-4f9a-a226-ee6c8ce48bb8
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Actuals vs PW' = ```
+			
+			VAR DisplayValue =
+			[VS Prior Wk Fcst_New]
+			Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+			
+			
+			```
+		formatString: #,0.0
+		lineageTag: 5e098977-26a4-4950-a82c-bce5ff0c4ca7
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Delta to Flash' =
+			
+			VAR DisplayValue = [EBBL+CumAct-CumNonExeOrders]-[Revenue Flash]
+			Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+		formatString: #,0.0
+		lineageTag: f386f2ac-b3ec-4cb6-b0b2-9b5698f55154
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure '% of Flash' = DIVIDE([EBBL+CumAct-CumNonExeOrders],[Revenue Flash])
+		formatString: 0%;-0%;0%
+		lineageTag: 47d026fa-0a9f-46a7-97f1-2d72acf3c2a3
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Current Wk Forecast_New' =
+			
+			CALCULATE(
+			    [Forecast Value],
+			    KEEPFILTERS(ColWkSorting[IsCurrentWeek] = "TRUE")
+			)
+		lineageTag: 64d34c74-b228-49a8-ad03-27eb052c69b9
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'VS Prior Wk Fcst_New' = ```
+			
+			
+			VAR OpenCloseStatus = SELECTEDVALUE(ColWkSorting[Open/Close])
+			VAR wkday = SELECTEDVALUE('rpt dim_current_date_rof'[weekday])
+			VAR RowCurrWeek =
+			    CALCULATE(
+			    SELECTEDVALUE(RowWkSorting[SortOrder]) ,
+			    RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR ColCurrWeek = SELECTEDVALUE(ColWkSorting[SortOrder])
+			VAR currweekvalue =
+			        CALCULATE(
+			        [Forecast Value],
+			    RowWkSorting[SortOrder] =RowCurrWeek
+			    )
+			VAR Days = IF(wkday<=4 && wkday>=2,1,2)
+			--If( (WEEKDAY(NOW(),1)) <= 4 && (WEEKDAY(NOW(),1) >=2), 1, 2)
+			
+			
+			Var RowcurrWk2= CALCULATE(
+			        [Forecast Value],
+			    RowWkSorting[SortOrder] =1)
+			
+			
+			VAR Preweekvalue =
+			if ( ColCurrWeek = 2,[Plan + Task_M1],
+			    if (OpenCloseStatus="Open", 
+			       if(RowCurrWeek=2 ,[Plan + Task_M1],
+			       if(RowCurrWeek=3 && Days=2,[Plan + Task_M1],
+			        CALCULATE(
+			            [Forecast Value],
+			            RowWkSorting[SortOrder] =RowCurrWeek-Days--,ColWkSorting[IsCurrentWeek]="TRUE"
+			            ))),
+			        CALCULATE(
+			            [Forecast Value],
+			            RowWkSorting[SortOrder] =ColCurrWeek-1
+			            )))
+			
+			VAR Total =  if(RowCurrWeek=2 ,[Plan + Task_M1],
+			       if(RowCurrWeek=3 && Days=2,[Plan + Task_M1],CALCULATE( [Forecast Value],RowWkSorting[SortOrder] =RowCurrWeek-Days)))
+			
+			
+			RETURN
+			
+			if (ISINSCOPE(ColWkSorting[Weeks]),
+			    currweekvalue-Preweekvalue,
+			    --currweekvalue-[Plan + Task_M1]
+			   currweekvalue-Total
+			)
+			
+			/*
+			
+			VAR OpenCloseStatus = SELECTEDVALUE(ColWkSorting[Open/Close])
+			VAR wkday = SELECTEDVALUE('rpt dim_current_date_rof'[weekday])
+			VAR RowCurrWeek =
+			    CALCULATE(
+			    SELECTEDVALUE(RowWkSorting[SortOrder]) ,
+			    RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR ColCurrWeek = SELECTEDVALUE(ColWkSorting[SortOrder])
+			VAR currweekvalue =
+			        CALCULATE(
+			        [Forecast Value],
+			    RowWkSorting[SortOrder] =RowCurrWeek
+			    )
+			VAR Days = IF(wkday<=4 && wkday>=2,1,2)
+			--If( (WEEKDAY(NOW(),1)) <= 4 && (WEEKDAY(NOW(),1) >=2), 1, 2)
+			
+			
+			Var RowcurrWk2= CALCULATE(
+			        [Forecast Value],
+			    RowWkSorting[SortOrder] =2)
+			
+			
+			VAR Preweekvalue =
+			if ( ColCurrWeek = 3,[Plan + Task_M1],
+			    if (OpenCloseStatus="Open", 
+			       if(RowCurrWeek=3 ,[Plan + Task_M1],
+			       if(RowCurrWeek=4 && Days=2,[Plan + Task_M1],
+			        CALCULATE(
+			            [Forecast Value],
+			            RowWkSorting[SortOrder] =RowCurrWeek-Days--,ColWkSorting[IsCurrentWeek]="TRUE"
+			            ))),
+			        CALCULATE(
+			            [Forecast Value],
+			            RowWkSorting[SortOrder] =ColCurrWeek-1
+			            )))
+			
+			VAR Total =  if(RowCurrWeek=3 ,[Plan + Task_M1],
+			       if(RowCurrWeek=4 && Days=2,[Plan + Task_M1],CALCULATE( [Forecast Value],RowWkSorting[SortOrder] =RowCurrWeek-Days)))
+			
+			
+			RETURN
+			
+			if (ISINSCOPE(ColWkSorting[Weeks]),
+			    currweekvalue-Preweekvalue,
+			    --currweekvalue-[Plan + Task_M1]
+			   currweekvalue-Total
+			)
+			*/
+			```
+		lineageTag: b9afd247-5a6f-4224-ab3a-5bc666524843
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure vsPriorwkforecasttable = sumx(ColWkSorting,[VS Prior Wk Fcst_New])
+		lineageTag: 58ca6908-c57a-402f-8a77-198dedf859e7
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Check Cal' = ```
+			
+			SWITCH(TRUE(),
+			
+			MAX(Metrics[Forecast vs Flash])="Actuals vs PW" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Actuals vs PW],
+			max(Metrics[Forecast vs Flash])="Actuals vs PW" && MAX(ColWkSorting[WKDyn]) <>"CurrWeek-1",BLANK(),
+			MAX(Metrics[Forecast vs Flash])="Actuals vs PW (Cum)" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[SC_Cumu VS Prior Wk Fcst],
+			max(Metrics[Forecast vs Flash])="Actuals vs PW (Cum)" && MAX(ColWkSorting[WKDyn]) <>"CurrWeek-1",BLANK(),
+			MAX(Metrics[Forecast vs Flash])="Delta to Flash"&&  MAX(ColWkSorting[Weeks]) in {"W9","W10","W11"},[Delta to Flash],
+			MAX(Metrics[Forecast vs Flash])="% of Flash"&& MAX(ColWkSorting[Weeks]) in {"W9","W10","W11"},FORMAT([% of Flash],"0%"),
+			MAX(Metrics[Forecast vs Flash])="Delta to Flash"||MAX(Metrics[Forecast vs Flash])="% of Flash",BLANK())
+			
+			
+			```
+		formatString: 0.0
+		lineageTag: 88b012b4-2e31-437f-8c7f-4a6c3774d222
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'CF for Actuals VS PW' = ```
+			
+			VAR VS = 
+			if(ISINSCOPE(Metrics[Forecast vs Flash]) && MAX(Metrics[Forecast vs Flash])="Actuals vs PW" && CONVERT([Actuals vs PW],DOUBLE)<0,1,0)
+			
+			Return
+			VS
+			--IF(VS<0,"#C00000")
+			```
+		formatString: 0
+		lineageTag: 5ee3b498-4370-4ae3-bdfb-af02e27afbf4
+
+		changedProperty = IsHidden
+
+	measure 'VS Prior Wk Fcst_New_Actuals vs PW' =
+			
+			
+			VAR OpenCloseStatus = SELECTEDVALUE(ColWkSorting[Open/Close])
+			
+			VAR RowCurrWeek =
+			                    CALCULATE(
+			                    SELECTEDVALUE(RowWkSorting[SortOrder]) ,
+			                    RowWkSorting[IsCurrentWeek] = "TRUE"
+			                    )
+			
+			VAR ColCurrWeek = SELECTEDVALUE(ColWkSorting[SortOrder])
+			
+			VAR currweekvalue =
+			                    CALCULATE(
+			                    [Forecast Value],
+			                    RowWkSorting[SortOrder] =RowCurrWeek
+			                    )
+			
+			VAR Days =
+			                    If( (WEEKDAY(NOW(),14)) >= 1 && (WEEKDAY(NOW(),14) <=7), 1, 0
+			                    )
+			
+			VAR Preweekvalue =
+			                if ( ColCurrWeek = 2,[Plan + Task_M1],
+			                    if (OpenCloseStatus="Open",
+			                            CALCULATE(
+			                            [Forecast Value],
+			                            RowWkSorting[SortOrder] =RowCurrWeek-Days--,ColWkSorting[IsCurrentWeek]="TRUE"
+			                     ),CALCULATE(
+			                             [Forecast Value],
+			                            RowWkSorting[SortOrder] =ColCurrWeek-1
+			                    )))
+			
+			RETURN
+			
+			if (ISINSCOPE(ColWkSorting[Weeks]),
+			    currweekvalue-Preweekvalue,currweekvalue-CALCULATE( [Forecast Value],
+			    RowWkSorting[SortOrder] =RowCurrWeek-Days
+			
+			))
+			/*
+			
+			VAR OpenCloseStatus = SELECTEDVALUE(ColWkSorting[Open/Close])
+			
+			VAR RowCurrWeek =
+			
+			CALCULATE(
+			
+			SELECTEDVALUE(RowWkSorting[SortOrder]) ,
+			
+			RowWkSorting[IsCurrentWeek] = "TRUE"
+			
+			)
+			
+			VAR ColCurrWeek = SELECTEDVALUE(ColWkSorting[SortOrder])
+			
+			
+			
+			VAR currweekvalue =
+			
+			CALCULATE(
+			
+			[Forecast Value],
+			
+			RowWkSorting[SortOrder] =RowCurrWeek
+			
+			)
+			
+			VAR Days =
+			
+			If( (WEEKDAY(NOW(),14)) >= 1 && (WEEKDAY(NOW(),14) <=7), 1, 0
+			
+			)
+			
+			VAR Preweekvalue =
+			
+			if ( ColCurrWeek = 3,[Plan + Task_M1],
+			
+			if (OpenCloseStatus="Open",
+			
+			CALCULATE(
+			
+			[Forecast Value],
+			
+			RowWkSorting[SortOrder] =RowCurrWeek-Days--,ColWkSorting[IsCurrentWeek]="TRUE"
+			
+			),CALCULATE(
+			
+			[Forecast Value],
+			
+			RowWkSorting[SortOrder] =ColCurrWeek-1
+			
+			)))
+			
+			RETURN
+			
+			if (ISINSCOPE(ColWkSorting[Weeks]),
+			
+			currweekvalue-Preweekvalue,currweekvalue-CALCULATE( [Forecast Value],
+			
+			RowWkSorting[SortOrder] =RowCurrWeek-Days
+			
+			))
+			*/
+		lineageTag: a15e60e0-48f4-4277-908e-7a781eaad3d4
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Compute = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 1]="Compute"))
+		formatString: #,0
+		lineageTag: 87a9334b-e9fe-491c-973b-5a7bc9e01c1c
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure Edge = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 2]="Edge"))
+		formatString: #,0
+		lineageTag: 20c82c7f-2eef-4207-8f1c-49179fdec271
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'HPC & AI' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 1]="HPC & AI"))
+		formatString: #,0
+		lineageTag: be2f0490-dbfe-498f-bee7-b713dc7ef38d
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Storage = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 1]="Storage"))
+		formatString: #,0
+		lineageTag: 6bf0d103-7db3-451e-b0ed-c97ca93ec90e
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'SC_Month Plans' = ```
+			
+			VAR MonSel = SELECTEDVALUE('Month Selection'[Month])
+			VAR Result = 
+			            SWITCH(TRUE(),
+			            MonSel="M1",[vs Plan_M1],
+			            MonSel="M2",[vs Plan_M2],
+			            MonSel="M3",[vs Plan_M3])
+			
+			Return
+			Result
+			
+			```
+		formatString: #,0.0
+		lineageTag: ba3a4587-87f8-4cd1-ab4d-617bb1f4eb54
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'SC_Cumu Month Plans' =
+			
+			CALCULATE(
+			    [SC_Month Plans],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: #,0.0
+		lineageTag: a74c5f1c-e877-4267-b361-22130dfe8037
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Current Wk Forecast Clari' = ```
+			
+			 VAR DisplayValue = CALCULATE([Current Wk Forecast],'ROF Forecast'[Clari/ROF]="Unadjusted (Clari)",'ROF Forecast'[Forecast Level]=SELECTEDVALUE(ROF_Clari_Final_Split[Forecast Level]))
+			 VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(DisplayValue,"0")))
+			    Return
+			    Result
+			
+			```
+		formatString: #,0.0
+		lineageTag: b3d75000-f19e-4e6d-8043-199277d75e39
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Orders Refresh Concat' = ```
+			
+			    "APJ: " & CALCULATE(FORMAT(MAX(DataRefreshConfig[Refresh Date Copy]),"mmmm dd,yyyy"),DataRefreshConfig[DataSet]="QTD FinancialOrders",DataRefreshConfig[DataSetGroup]="Except ROF",DataRefreshConfig[Geo]="APJ")
+			&
+			    " |  EMEA: "& CALCULATE(FORMAT(MAX(DataRefreshConfig[Refresh Date Copy]),"mmmm dd,yyyy"),DataRefreshConfig[DataSet]="QTD FinancialOrders",DataRefreshConfig[DataSetGroup]="Except ROF",DataRefreshConfig[Geo]="EMEA")
+			&
+			    " |  AMS: " & CALCULATE(FORMAT(MAX(DataRefreshConfig[Refresh Date Copy]),"mmmm dd,yyyy"),DataRefreshConfig[DataSet]="QTD FinancialOrders",DataRefreshConfig[DataSetGroup]="Except ROF",DataRefreshConfig[Geo]="AMS")
+			```
+		lineageTag: 7f814a04-ca7a-48cd-a07f-e9f2800a07cf
+
+		changedProperty = IsHidden
+
+	measure DaysToGo = ```
+			VAR DayToday = FORMAT(TODAY(), "ddd")
+			VAR DaystoGo= 
+			    CALCULATE(
+			        SELECTEDVALUE( 'Days Table'[To Go] ),
+			        'Days Table'[Day] = DayToday
+			    )
+			
+			RETURN
+			DaystoGo
+			```
+		formatString: 0
+		lineageTag: 94834335-cfac-4e92-b374-5455ef52d3df
+
+		changedProperty = IsHidden
+
+	measure DaysPassed = ```
+			
+			VAR DayToday = FORMAT(TODAY(), "ddd")
+			VAR DaysPassed = 
+			    CALCULATE(
+			        SELECTEDVALUE( 'Days Table'[Number] ),
+			        'Days Table'[Day] = DayToday
+			    )
+			
+			RETURN
+			DaysPassed
+			```
+		formatString: 0
+		lineageTag: 3c5d6d64-60ee-419f-86e9-79761d4a6b67
+
+		changedProperty = IsHidden
+
+	measure 'vs Prior Wk Fcst (ROF)' = ```
+			VAR DisplayValue =
+			 CALCULATE(([VS Prior Wk Fcst_New]),KEEPFILTERS('ROF Forecast'[Clari/ROF]="ROF"))
+			VAR Result =
+			       if( [Sel Decimal]="w decimal",CONVERT(DisplayValue,DOUBLE),
+			        if([Sel Decimal]="no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			  Result
+			
+			
+			
+			
+			```
+		formatString: #,0.0
+		displayFolder: "vs" Measures
+		lineageTag: d23192a5-6708-49ad-931c-aa2fa3927171
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Cum Order Plan value' = ```
+			
+			CALCULATE(
+			    [M1_M2_M3 MIX],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+			
+			```
+		lineageTag: 8ce7af53-839b-4324-8e18-b06c244bb7d1
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Cum Forecast' =
+			
+			CALCULATE(
+			    [Current Wk Forecast],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		lineageTag: b034438b-4600-4518-b95b-e73f360f3aee
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'vs Order Plan Cum' = ```
+			
+			        VAR Num = [Cum Forecast]
+			        VAR Den = [Cum Order Plan value]
+			Return
+			DIVIDE(Num,Den)
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: "vs" Measures
+		lineageTag: 01482ee2-0d7c-472c-b236-bea528d17ecd
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Cum M1 Order Plan + Task' =
+			
+			CALCULATE(
+			    [M1 Order Plan+Task],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: 0.0
+		displayFolder: Target Measures
+		lineageTag: f68c99f1-9e75-4d1d-989e-8fc76a9bd379
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Cum M2 Order Plan + Task' =
+			
+			CALCULATE(
+			    [M2 Order Plan+Task],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: 0.0
+		displayFolder: Target Measures
+		lineageTag: d4268226-1cb1-4538-a33d-81e5517b5d0c
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Cum M3 Order Plan + Task' =
+			
+			CALCULATE(
+			    [M3 Order Plan+Task],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: 0.0
+		displayFolder: Target Measures
+		lineageTag: ddb3557b-4225-47c1-ae12-827ee4873b6a
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'VS Prior Wk Fcst_New_Decimal' =
+			
+			VAR DisplayValue = [VS Prior Wk Fcst_New]
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		lineageTag: 32593634-5a40-4f6a-8bc5-9187767fc095
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Order 2' = ```
+			
+			VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR DisplayValue = 
+			    CALCULATE(
+			        [Forecast Value],
+			        KEEPFILTERS(RowWkSorting[IsCurrentWeek] = "TRUE"), 
+			        KEEPFILTERS(ColWkSorting[Open/Close] = "Close"),
+			        KEEPFILTERS('ROF Forecast'[Clari/ROF] = "ROF")
+			
+			    )
+			  VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"),INTEGER)))
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            Result
+			        ),
+			        Result
+			    )
+			```
+		formatString: #,0
+		lineageTag: 7abd0af4-48db-45e1-b83f-abf309bbefc7
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'M1_M2_M3 MIX 1' = ```
+			
+			VAR M1 = 
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W2","W3","W4","W5"}
+			    )
+			VAR M2 =  IF( [M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W6","W7","W8","W9"}
+			  ),CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W6","W7","W8","W9"}))
+			VAR M3 = IF([M3 Order Plan+Task]=0,
+			            IF([M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W10","W11","W12","W13"}),
+			    
+			    CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W10","W11","W12","W13"})),
+			       
+			    CALCULATE(
+			        [M3 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W10","W11","W12","W13"}
+			    ))
+			VAR DisplayValue =M1+M2+M3
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"),INTEGER)))
+			RETURN
+			Result
+			    -- M1+M2+M3
+			
+			    /*AR M1 = 
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W3","W4","W5","W6"}
+			    )
+			VAR M2 =  IF( [M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W7","W8","W9","W10"}
+			  ),CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W7","W8","W9","W10"}))
+			VAR M3 = IF([M3 Order Plan+Task]=0,
+			            IF([M2 Order Plan+Task]=0,
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W11","W12","W13","W13-1"}),
+			    
+			    CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W11","W12","W13","W13-1"})),
+			       
+			    CALCULATE(
+			        [M3 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W11","W12","W13","W13-1"}
+			    ))
+			VAR DisplayValue =M1+M2+M3
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"),INTEGER)))
+			RETURN
+			Result
+			    -- M1+M2+M3
+			*/
+			
+			```
+		formatString: #,0.0
+		lineageTag: 5cd573dc-f0de-47f5-a36b-47e13c843225
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'WTD Orders 1' =
+			
+			VAR DisplayValue = CALCULATE([WTD Orders])
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			-- VAR DisplayValue = CALCULATE([WTD Orders],USERELATIONSHIP('Prod Bridge'[ProductKey],'Load Bookings'[ProductKey]),USERELATIONSHIP('Geo Bridge'[GeoKey],'Load Bookings'[GeoKey]),'Load Bookings'[FinancialOrderFlag]="Y")
+		formatString: 0.0
+		lineageTag: 8b99e6e4-9eab-4ab6-9440-c2bd0fe4b1c4
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Hide Visual' = IF(SELECTEDVALUE('w / wo Decimal'[Decimal Pointer])="w decimal",1,0)
+		formatString: 0
+		lineageTag: 8174b67a-50c7-4d51-bc82-a8221af3231a
+
+		changedProperty = IsHidden
+
+	measure 'WTD Orders 2' =
+			
+			VAR DisplayValue = CALCULATE([WTD Orders])
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(DisplayValue,INTEGER)))
+			    Return
+			    Result
+			
+			--VAR DisplayValue = CALCULATE([WTD Orders],USERELATIONSHIP('Prod Bridge'[ProductKey],'Load Bookings'[ProductKey]),USERELATIONSHIP('Geo Bridge'[GeoKey],'Load Bookings'[GeoKey]),'Load Bookings'[FinancialOrderFlag]="Y")
+		formatString: 0.0
+		lineageTag: cc022343-0ef9-4b79-8e80-10529c9da28b
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Delta 1' =
+			VAR DisplayValue =
+			[WTD Orders 1] - [Curr Week Single Value]
+			 VAR Result = SWITCH(TRUE(),
+			        [Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    [Sel Decimal]= "no decimal",CONVERT(DisplayValue,INTEGER))
+			    Return
+			    Result
+		formatString: 0.0
+		lineageTag: 59e58193-c467-4012-8bf2-9b81ed76ca72
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'Curr Week Single Value 1' = ```
+			
+			VAR InflightWeekNo = MAX('rpt dim_current_date_rof'[fiscal_week]) 
+			VAR InflightWeekForecast=
+			        CALCULATE(
+			             [Forecast Value],
+			                 RowWkSorting[SortOrder] = InflightWeekNo -1,
+			                 ColWkSorting[SortOrder] = InflightWeekNo,
+			                'ROF Forecast'[Clari/ROF]="ROF"
+			        )
+			VAR Displayvalue = InflightWeekForecast
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(Displayvalue=BLANK(),0,Displayvalue),"#,0")))
+			
+			RETURN Result
+			```
+		formatString: 0.0
+		lineageTag: 0153099a-9e01-47c9-8989-10a512a6d4d7
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'CF for QTD v/s Plan' = IF(CONVERT([QTD v/s Plan],DOUBLE)<0,1,0)
+		formatString: 0
+		lineageTag: 417eab52-f568-49cc-8c68-b2e33c0f3be7
+
+		changedProperty = IsHidden
+
+	measure Diff_fcst = ```
+			VAR CF = CALCULATE([Total Judgement],ROF_Clari_Final_Split[Forecast Level]="Country Forecast")
+			            VAR GF = CALCULATE([Total Judgement],ROF_Clari_Final_Split[Forecast Level]="GEO Forecast")
+			            VAR DisplayValue =  if(NOT(ISINSCOPE('Geo Master'[SubRegion1])&&ISINSCOPE(ROF_Clari_Final_Split[Forecast Level])),CF-GF,[Total Judgement])
+			            VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			            Return
+			         Result
+			         
+			```
+		formatString: 0.0
+		lineageTag: bc6048ca-10ad-4bc0-a8f8-fec59e04c979
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure Linearity = ```
+			VAR Num =[Cum Orders]
+			
+			VAR Den = IF([M3 Order Plan+Task]<>0,[M3 Order Plan+Task],
+			IF([M3 Order Plan+Task]=0 && [M2 Order Plan+Task]<>0,[M2 Order Plan+Task],
+			IF([M3 Order Plan+Task]=0 && [M2 Order Plan+Task]=0,[M1 Order Plan+Task],[M1 Order Plan+Task])))
+			VAR Output = 
+			IFERROR(CALCULATE(DIVIDE( Num,Den),ALL('ROF Forecast'[Clari/ROF]),ALL('ROF Forecast'[Forecast Level])),
+			    BLANK()
+			)
+			Return
+			
+			Output
+			```
+		formatString: 0%;-0%;0%
+		lineageTag: 8921a2c1-9213-4ec8-8207-91ff10a056e0
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'ROF Detailed_ROF Forecast' =
+			
+			VAR OpenCloseStatus = SELECTEDVALUE(ColWkSorting[Open/Close])
+			VAR wkday = SELECTEDVALUE('rpt dim_current_date_rof'[weekday])
+			VAR RowCurrWeek =CALCULATE(SELECTEDVALUE(RowWkSorting[SortOrder]) ,RowWkSorting[IsCurrentWeek] = "TRUE")
+			
+			VAR ColCurrWeek = SELECTEDVALUE(ColWkSorting[SortOrder])
+			VAR currweekvalue =CALCULATE([Forecast Value],RowWkSorting[SortOrder] =RowCurrWeek)
+			
+			VAR Days = IF(wkday<=4 && wkday>=2,1,2)
+			VAR WK3 = CALCULATE([Plan + Task_M1],ColWkSorting[SortOrder]=2)
+			VAR RemoveWK3 = CALCULATE( [Forecast Value],RowWkSorting[SortOrder] =2,ColWkSorting[SortOrder]=2)
+			
+			--If( (WEEKDAY(NOW(),1)) <= 4 && (WEEKDAY(NOW(),1) >=2), 1, 2)
+			
+			VAR Preweekvalue =if ( ColCurrWeek = 2,[Plan + Task_M1],CALCULATE([Forecast Value],RowWkSorting[SortOrder] =ColCurrWeek-1))
+			VAR TotalFcst = CALCULATE([Plan + Task_M1],'RowWkSorting'[SortOrder] = currweekvalue,'ColWkSorting'[SortOrder] =2)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 2,'ColWkSorting'[SortOrder] =3)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 3,'ColWkSorting'[SortOrder] =4)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 4,'ColWkSorting'[SortOrder] =5)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 5,'ColWkSorting'[SortOrder] =6)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 6,'ColWkSorting'[SortOrder] =7)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 7,'ColWkSorting'[SortOrder] =8)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 8,'ColWkSorting'[SortOrder] =9)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 9,'ColWkSorting'[SortOrder] =10)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 10,'ColWkSorting'[SortOrder] =11)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 11,'ColWkSorting'[SortOrder] =12)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 12,'ColWkSorting'[SortOrder] =13)
+			
+			RETURN
+			
+			if (ISINSCOPE(ColWkSorting[Weeks]),
+			
+			Preweekvalue,TotalFcst)
+			
+			/*
+			VAR OpenCloseStatus = SELECTEDVALUE(ColWkSorting[Open/Close])
+			VAR wkday = SELECTEDVALUE('rpt dim_current_date_rof'[weekday])
+			VAR RowCurrWeek =CALCULATE(SELECTEDVALUE(RowWkSorting[SortOrder]) ,RowWkSorting[IsCurrentWeek] = "TRUE")
+			
+			VAR ColCurrWeek = SELECTEDVALUE(ColWkSorting[SortOrder])
+			VAR currweekvalue =CALCULATE([Forecast Value],RowWkSorting[SortOrder] =RowCurrWeek)
+			
+			VAR Days = IF(wkday<=4 && wkday>=2,1,2)
+			VAR WK3 = CALCULATE([Plan + Task_M1],ColWkSorting[SortOrder]=3)
+			VAR RemoveWK3 = CALCULATE( [Forecast Value],RowWkSorting[SortOrder] =3,ColWkSorting[SortOrder]=3)
+			
+			--If( (WEEKDAY(NOW(),1)) <= 4 && (WEEKDAY(NOW(),1) >=2), 1, 2)
+			
+			VAR Preweekvalue =if ( ColCurrWeek = 3,[Plan + Task_M1],CALCULATE([Forecast Value],RowWkSorting[SortOrder] =ColCurrWeek-1))
+			VAR TotalFcst = CALCULATE([Plan + Task_M1],'RowWkSorting'[SortOrder] = currweekvalue,'ColWkSorting'[SortOrder] =3)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 3,'ColWkSorting'[SortOrder] =4)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 4,'ColWkSorting'[SortOrder] =5)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 5,'ColWkSorting'[SortOrder] =6)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 6,'ColWkSorting'[SortOrder] =7)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 7,'ColWkSorting'[SortOrder] =8)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 8,'ColWkSorting'[SortOrder] =9)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 9,'ColWkSorting'[SortOrder] =10)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 10,'ColWkSorting'[SortOrder] =11)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 11,'ColWkSorting'[SortOrder] =12)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 12,'ColWkSorting'[SortOrder] =13)+
+			                    CALCULATE([Forecast Value],'RowWkSorting'[SortOrder] = 13,'ColWkSorting'[SortOrder] =14)
+			
+			RETURN
+			
+			if (ISINSCOPE(ColWkSorting[Weeks]),
+			
+			Preweekvalue,TotalFcst)
+			
+			*/
+		lineageTag: ec3598be-263e-476c-a1ea-cbf8aabede12
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'ROF Forecast' =
+			VAR Displayvalue =
+			CALCULATE([ROF Detailed_ROF Forecast],'ROF Forecast'[Clari/ROF]="ROF")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+		formatString: #,0.0
+		lineageTag: e1529111-d9b9-467b-9e0b-2de17d81175a
+
+		changedProperty = FormatString
+
+		changedProperty = IsHidden
+
+	measure 'CF for font(SCMonthPlans)' =
+			
+			IF([SC_Month Plans]<=0,"#C00000")
+		lineageTag: d292c95d-077a-4a44-9199-838abc02edd4
+
+		changedProperty = IsHidden
+
+	measure 'CF for font(SCCumMonthPlans)' =
+			
+			IF([SC_Cumu Month Plans]<=0,"#C00000")
+		lineageTag: d2813592-fb1f-44bf-b727-362852e56dcc
+
+		changedProperty = IsHidden
+
+	measure 'For Linearity metric_Den_M1_M2_M3 MIX' = ```
+			
+			VAR M1 = 
+			    CALCULATE(
+			        [M1 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W2","W3","W4","W5"}
+			    )
+			VAR M2 = 
+			    CALCULATE(
+			        [M2 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W6","W7","W8","W9"})
+			
+			VAR M3 = 
+			    CALCULATE(
+			        [M3 Order Plan+Task],
+			        'ROF OrderPlan'[WeekNo] IN {"W10","W11","W12","W13"}
+			    )
+			
+			VAR DisplayValue = IF(M3<>0,M3,
+			                    IF(M3=0 && M2<>0,M2,
+			                    IF(M3=0 && M2=0,M1)))
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",CONVERT(FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0"),INTEGER)))
+			RETURN
+			Result
+			```
+		lineageTag: c2715c34-b429-4e1f-8dc4-edab14e84d8a
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'For Linearity_Den_Cum M1_M2_M3' =
+			
+			CALCULATE(
+			    [For Linearity metric_Den_M1_M2_M3 MIX],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		lineageTag: 95ee5088-245c-4b5f-8ed7-059e71802f7d
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Non Exec Cum (Linearity)' =
+			
+			VAR DisplayValue =calculate([Non Exec Total],ColWkSorting[Open/Close]="Close")
+			Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+		lineageTag: d748c9de-306f-4611-9c2a-7bd84f766df2
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Order Budget_Services' = ```
+			VAR DisplayValue = CALCULATE(DIVIDE(SUM('rpt flashbudget_OR'[Amount]),10^6),'rpt flashbudget_OR'[Target]="Budget",'rpt flashbudget_OR'[Source]="Anaplan")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		lineageTag: c3842148-e4bc-46e4-947d-2e4ac3c26aff
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Order Flash_Services' = ```
+			VAR DisplayValue = CALCULATE(DIVIDE(SUM('rpt flashbudget_OR'[Amount]),10^6),'rpt flashbudget_OR'[Target]="Flash",'rpt flashbudget_OR'[Source]="Anaplan")
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+			
+			```
+		lineageTag: 7ed5daab-987a-4b94-ac80-11d7316a62af
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Orders_Services = ```
+			CALCULATE(DIVIDE(SUM('Load Bookings'[bookings]),10^6),'Date'[is_current_week]=1)
+			
+			
+			```
+		lineageTag: babf14dd-8a20-45fa-aa83-92f08a942a31
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Deal Based Forecast_Services' = ```
+			VAR DisplayValue =
+			[Commit_Services]-
+			CALCULATE(
+			    [Total Revenue_Services],
+			    FILTER('ColWkSorting',ColWkSorting[Open/Close]="Open"),
+			   FILTER('RowWkSorting',RowWkSorting[Open/Close]="Open"),
+			    
+			   'Pipeline_Services'[ForecastCategory] ="Commit",
+			    'Pipeline_Services'[DealBased_In/Out] ="Out")
+			+
+			CALCULATE(
+			    [Total Revenue_Services],
+			    'Pipeline_Services'[ForecastCategory] in {"Upside","Pipeline ES","Pipeline LS"},
+			   'Pipeline_Services'[DealBased_In/Out] in {"In","In At Risk","In At Risk - To Defer to NQ"})
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			```
+		lineageTag: 7bf6d55c-3c68-490d-82c2-867f1cc6c8d8
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '(Orders + DBF)/Budget_Services' = ```
+			
+			 VAR DisplayValue =DIVIDE(([Orders_Services]+[Deal Based Forecast_Services]),[Order Budget_Services])
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: f371238b-b218-4528-8022-fc8f3b70c997
+
+		changedProperty = IsHidden
+
+	measure 'Commit At Risk_Services' = ```
+			VAR DisplayValue =
+			CALCULATE(
+			    [Total Revenue_Services],Pipeline_Services[ForecastCategory] IN {"Commit","Upside","Pipeline LS","Pipeline ES"},
+			    
+			    'Pipeline_Services'[DealBased_In/Out] in {"In At Risk","In At Risk - To Defer to NQ"},
+			    FILTER('ColWkSorting',ColWkSorting[Open/Close]="Open"),
+			    FILTER('RowWkSorting',RowWkSorting[Open/Close]="Open"))
+			    
+			
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			```
+		lineageTag: bd0f8e62-17a8-4a35-bb2d-e8f62e4d4c0c
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Commit_Services = ```
+			VAR DisplayValue =
+			CALCULATE(
+			   [Total Revenue_Services],'Pipeline_Services'[ForecastCategory]="Commit",
+			    FILTER('ColWkSorting',ColWkSorting[Open/Close]="Open"),
+			   FILTER('RowWkSorting',RowWkSorting[Open/Close]="Open"))
+			    
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			```
+		lineageTag: f76ee3a5-9a50-4577-9020-8d2bc2ef97f0
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Strong Upside_Services' = ```
+			VAR DisplayValue =
+			CALCULATE(
+			    [Total Revenue_Services],Pipeline_Services[ForecastCategory] IN {"Commit","Upside","Pipeline LS","Pipeline ES"},
+			    
+			    'Pipeline_Services'[DealBased_In/Out] ="Strong Upside",
+			    FILTER('ColWkSorting',ColWkSorting[Open/Close]="Open"),
+			    FILTER('RowWkSorting',RowWkSorting[Open/Close]="Open"))
+			    
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			```
+		lineageTag: bed91190-067b-47b6-a31b-c9a1fbc2804a
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Pipeline_Services = ```
+			VAR DisplayValue =
+			CALCULATE(
+			   [Total Revenue_Services],'Pipeline_Services'[ForecastCategory] in {"Pipeline ES","Pipeline LS"},
+			     FILTER('ColWkSorting',ColWkSorting[Open/Close]="Open"),
+			   FILTER('RowWkSorting',RowWkSorting[Open/Close]="Open"))
+			    
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			
+			```
+		lineageTag: e98b0f7c-d95b-4aa9-946a-c8c4b5cd486f
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Revenue_Services' = DIVIDE(SUM('Pipeline_Services'[Revenue]),10^6)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 35812943-1431-4bec-81a0-606435a64901
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure Upside_Services = ```
+			VAR DisplayValue =
+			CALCULATE(
+			   [Total Revenue_Services],'Pipeline_Services'[ForecastCategory]="Upside",
+			      FILTER('ColWkSorting',ColWkSorting[Open/Close]="Open"),
+			   FILTER('RowWkSorting',RowWkSorting[Open/Close]="Open"))
+			    
+			
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			
+			Return
+			Result
+			```
+		lineageTag: bed4abf3-5dcb-4fd8-949b-7500894b424e
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Fcst vs M1 plan' = DIVIDE([Current Wk Forecast],[Plan + Task_M1],0)
+		formatString: 0%;-0%;0%
+		lineageTag: fb24b692-e202-483b-b221-b717a827fde1
+
+		changedProperty = IsHidden
+
+	measure 'Fcst vs M2 plan' = DIVIDE([Current Wk Forecast],[Plan + Task_M2],0)
+		formatString: 0%;-0%;0%
+		lineageTag: d171e936-4ff8-40a7-80a5-4e3034d24164
+
+		changedProperty = IsHidden
+
+	measure 'M1 NEO Value' = ```
+			VAR CurrentMonth = "M1"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM(ROF_NEO[NEOPValue]),FILTER('ROF_NEO',ROF_NEO[MonthPlan]=CurrentMonth)
+			       
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    RETURN
+			    
+			    
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			             CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			          --   CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        ),
+			      Result
+			    )
+			```
+		formatString: 0
+		lineageTag: 732468bc-294c-4b90-a7f3-6045997b91d8
+
+		changedProperty = IsHidden
+
+	measure 'M2 NEO Value' = ```
+			VAR CurrentMonth = "M2"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM(ROF_NEO[NEOPValue]),FILTER('ROF_NEO',ROF_NEO[MonthPlan]=CurrentMonth)
+			       
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			             CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			             --CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        ),
+			      Result
+			    )
+			```
+		formatString: 0
+		lineageTag: cb7b1904-329c-406b-bd3f-8a7b96a363bb
+
+		changedProperty = IsHidden
+
+	measure 'M3 NEO Value' = ```
+			VAR CurrentMonth = "M3"
+			VAR DisplayValue = 
+			    CALCULATE(
+			        SUM(ROF_NEO[NEOPValue]),FILTER('ROF_NEO',ROF_NEO[MonthPlan]=CurrentMonth)
+			       
+			    )
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))   
+			    RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]),
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(),
+			             CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1"},BLANK(),
+			            -- CurrentMonth, IF(SELECTEDVALUE(ColWkSorting[Weeks]) in{"W1","W2"},BLANK(),
+			            Result)
+			        ),
+			      Result
+			    )
+			```
+		formatString: 0
+		lineageTag: 16012ca8-b409-4b0a-a7dc-5c13b2c0d1c1
+
+		changedProperty = IsHidden
+
+	measure 'NEO Value' = ```
+			
+			
+			IF([M3 NEO Value]<>0,[M3 NEO Value],
+			IF([M3 NEO Value]=0 && [M2 NEO Value]<>0,[M2 NEO Value],
+			IF([M3 NEO Value]=0 && [M2 NEO Value]=0,[M1 NEO Value],[M1 NEO Value])))
+			
+			
+			```
+		lineageTag: d488c565-a582-40e8-ab8f-18d6bf6211ee
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Exec Orders incl EBBL' = [EBBL]+[Order Budget Plan]-[NEO Value]
+		lineageTag: be0950c5-0541-4539-b289-4ed6e5e42e56
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total ROF Pipeline Detailed1' = SUM('ROF Pipeline'[Value])
+		lineageTag: 4c03005e-63ca-403c-b90a-7814d0507ee4
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Cum Orders + Forecast (ROF)' = ```
+			
+			    CALCULATE(
+			        [Forecast Value],
+			        FILTER(
+			            ALL(ColWkSorting),
+			            ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			        )
+			        ,
+			        KEEPFILTERS(RowWkSorting[Week] = "W13 + 1"))
+			```
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: 3212abff-0afe-4f6b-ba5b-99294b7dcb08
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Measure title' = SELECTEDVALUE('Month Selection'[Month]) & " Order Plan"
+		lineageTag: b2d6391e-08d7-4728-8516-f6aec3b20e1c
+
+		changedProperty = IsHidden
+
+	measure 'Measure title 2' = "Gap by Week vs "&[Measure title]
+		lineageTag: ba3d46fa-9b23-40d8-b2cb-bd75d807baf1
+
+		changedProperty = IsHidden
+
+	measure 'Measure title 3' = "Cumulative Gap vs "&[Measure title]
+		lineageTag: 0da41d08-4301-4446-86b6-61d85415f402
+
+		changedProperty = IsHidden
+
+	measure 'Flex Solutions Services' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 1]="Flex Solutions Services"))
+		formatString: #,0
+		lineageTag: 76a3cb53-72d4-4160-9dbe-b9ab49be31f9
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Compute HW Core' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 3]="Compute HW Core"))
+		formatString: #,0
+		lineageTag: 2f2c9cd9-a86f-4331-98f8-2a2b1bde9147
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Storage HW Core' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 4]="Storage HW Core"))
+		formatString: #,0
+		lineageTag: c5e1838c-4ec2-47d1-af8d-e25a6f2030d7
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'HPC & AI HW Core' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 3]="HPC & AI HW"))
+		formatString: #,0
+		lineageTag: cb67a9ac-f52c-48e1-b794-3acd2f319f32
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'GL Flex Compute HW' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 4]="Flex Solutions Compute HW"))
+		formatString: #,0
+		lineageTag: 740658a1-1310-4b48-b6e4-09d7fcf64c81
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'GL Flex Storage HW' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 4]="Flex Solutions Storage HW"))
+		formatString: #,0
+		lineageTag: ac35ec5c-2d9a-474f-a4d1-00a62c25a903
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'HPC & AI GL (HW & Svs)' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 3]="HPC & AI GreenLake (HW & Services)"))
+		formatString: #,0
+		lineageTag: bc3d7d7b-348b-49a3-9f30-c4e205b817ff
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Private Cloud HW' = CALCULATE(SUM('ROF Pipeline'[Value]),FILTER('Prod Master','Prod Master'[BU 4]="Private Cloud HW"))
+		formatString: #,0
+		lineageTag: d5d08bb6-23de-4c7f-9651-a20de76e9aa7
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Fcst vs M3 plan' = DIVIDE([Current Wk Forecast],[Plan + Task_M3],0)
+		formatString: 0%;-0%;0%
+		lineageTag: 39496643-8d13-4a23-afff-067fe2ca6e2a
+
+		changedProperty = IsHidden
+
+	measure Linearity_BOE = ```
+			VAR Num =[Cum Orders_BOE]
+			
+			VAR Den = IF([M3 Order Plan+Task]<>0,[M3 Order Plan+Task],
+			IF([M3 Order Plan+Task]=0 && [M2 Order Plan+Task]<>0,[M2 Order Plan+Task],
+			IF([M3 Order Plan+Task]=0 && [M2 Order Plan+Task]=0,[M1 Order Plan+Task],[M1 Order Plan+Task])))
+			VAR Output = 
+			IFERROR(CALCULATE(DIVIDE( Num,Den),ALL('ROF Forecast'[Clari/ROF]),ALL('ROF Forecast'[Forecast Level])),
+			    BLANK()
+			)
+			Return
+			
+			Output
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 5d0bac4f-ca63-49ab-97ad-380ef84c86bd
+
+		changedProperty = IsHidden
+
+	measure 'Cum Orders_BOE' = ```
+			
+			VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			VAR ValueDisplayed = 
+			    IF(
+			        [Orders_BOE]<> BLANK(),
+			        CALCULATE(DIVIDE(SUM('OrdersDetailed'[NetUSD]),10^6),
+			           // [Forecast Value],
+			            KEEPFILTERS(RowWkSorting[IsCurrentWeek] = "TRUE"), 
+			            KEEPFILTERS(ColWkSorting[Open/Close] = "Close" ||ColWkSorting[IsCurrentWeek]="True" && VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y"),
+			            KEEPFILTERS('ROF Forecast'[Clari/ROF] = "ROF"),
+			            FILTER(
+			                ALL(ColWkSorting),
+			                ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			            )
+			        )
+			    )
+			RETURN
+			    IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            ValueDisplayed
+			        ),
+			        ValueDisplayed
+			    )
+			```
+		lineageTag: cc3c7bad-171e-4d01-bb1e-45d3799159b5
+
+		changedProperty = IsHidden
+
+	measure Orders_BOE = ```
+			VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			
+			VAR DisplayValue = 
+			    CALCULATE(DIVIDE(SUM('OrdersDetailed'[NetUSD]),10^6)
+			   
+			    )
+			  VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN 
+			IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            Result
+			        ),
+			        Result
+			    )
+			 
+			  
+			    
+			```
+		formatString: #,0.0
+		displayFolder: BOE Order Details
+		lineageTag: f15dcf92-4bb0-48b9-9336-2d362b38ba6a
+
+		changedProperty = IsHidden
+
+	measure 'V/S Order Plan_BOE' =
+			
+			IFERROR(
+			    DIVIDE(
+			        [Orders_BOE],
+			        [M1_M2_M3 MIX]
+			    ),
+			    BLANK()
+			)
+		formatString: 0%;-0%;0%
+		lineageTag: 5002677a-d5e4-4d54-8ed9-694b0df47817
+
+		changedProperty = IsHidden
+
+	measure 'V/S Cum Order Plan_BOE' =
+			
+			IFERROR(
+			    DIVIDE(
+			        [Cum Orders_BOE],
+			        [Cum M1_M2_M3]
+			    ),
+			    BLANK()
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 4804f9e0-0d3d-4cab-94de-da6378c6cc01
+
+		changedProperty = IsHidden
+
+	measure 'QTD v/s Plan_BOE' =
+			
+			VAR DisplayValue =
+			[Orders_BOE] - [M1_M2_M3 MIX]
+			VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			    Return
+			    Result
+		formatString: #,0.0
+		lineageTag: 103b534f-e452-41eb-8872-9c6faf9dd0fc
+
+		changedProperty = IsHidden
+
+	measure 'CF for QTD v/s Plan_BOE' = IF(CONVERT([QTD v/s Plan_BOE],DOUBLE)<0,1,0)
+		formatString: 0
+		lineageTag: a96d4750-e273-4b4f-b039-f3d99092673f
+
+		changedProperty = IsHidden
+
+	measure 'Orders_Compute HW Core' = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 3]="Compute HW Core"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: 65e37e3a-e88e-4273-9945-7ce78dff3a7c
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Orders_Edge = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 2]="Edge"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: b08b78af-74fa-454a-a44d-57cd2e08be3b
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Orders_Flex Solutions Services' = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 1]="Flex Solutions Services"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: 7aeb7eff-ad85-499b-8406-01c25cdfd89a
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Orders_GL Flex Compute HW' = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 4]="Flex Solutions Compute HW"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: ffb76c3f-55d5-4f83-9c58-451e58e76256
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Orders_GL Flex Storage HW' = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 4]="Flex Solutions Storage HW"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: bfdc952f-0000-4983-b576-7329b485c37a
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Orders_HPC & AI GL (HW & Svs)' = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 3]="HPC & AI GreenLake (HW & Services)"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: 353efe42-f0b8-4a3c-a490-3db5b8a055c7
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Orders_Private Cloud HW' = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 4]="Private Cloud HW"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: bd678e82-c07a-4a54-9d03-5e84b4acbb59
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Orders_Storage HW Core' = CALCULATE([Orders_BOE1],FILTER('Prod Master','Prod Master'[BU 4]="Storage HW Core"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: 5f059937-6102-45c5-b18c-db5c8e40cb1b
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Orders_BOE1 = ```
+			VAR Weekdisplayed = 
+			    CALCULATE(
+			        SELECTEDVALUE(RowWkSorting[Week]),
+			        RowWkSorting[IsCurrentWeek] = "TRUE"
+			    )
+			
+			VAR DisplayValue = 
+			    SUM('OrdersDetailed'[NetUSD])
+			   
+			    
+			  VAR Result = IF([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			RETURN 
+			IF(
+			        ISINSCOPE(ColWkSorting[Weeks]), 
+			        IF(
+			            SELECTEDVALUE(ColWkSorting[Weeks]) = BLANK(), 
+			            Weekdisplayed, 
+			            Result
+			        ),
+			        Result
+			    )
+			 
+			  
+			    
+			```
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: cc1ba203-8903-4152-9eec-2546fa51f1ab
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Orders_HPC & AI HW Core' = CALCULATE([Orders_BOE],FILTER('Prod Master','Prod Master'[BU 3]="HPC & AI HW"))
+		formatString: #,0
+		displayFolder: BOE Order Details
+		lineageTag: deb07199-a0f1-40a3-ab13-a5b1843c1478
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Fontcolor1 = IF(IF(MAX(TableNew[Column1])="Performance",[performance])="Overachieving",0,IF(IF(MAX(TableNew[Column1])="Performance",[performance])="Underperforming",1))
+		formatString: 0
+		displayFolder: "vs" Measures
+		lineageTag: 6feafab5-62fe-4452-8bab-fba3a37fc081
+
+	measure M1M2M3 = ```
+			
+			
+			VAR Week = SELECTEDVALUE(ColWkSorting[Weeks])
+			
+			RETURN
+			IF(Week IN{"W1","W2","W3","W4","W5"},[M1 Order Plan+Task],
+			IF(Week IN{"W6","W7","W8","W9","W10"},[M2 Order Plan+Task],[M3 Order Plan+Task]))
+			
+			```
+		formatString: 0.0
+		displayFolder: "vs" Measures
+		lineageTag: 6172d0f9-eab0-4a0c-8c06-6aabd64b4ffc
+
+	measure 'vs QTD M2 Plan' = [Cum Orders]-[Cum M1_M2_M3]
+		displayFolder: "vs" Measures
+		lineageTag: 562b0ef5-2fbb-48bd-bc7e-884b757b568a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure performance = IF([vs QTD M2 Plan]>=0,"Overachieving","Underperforming")
+		displayFolder: "vs" Measures
+		lineageTag: 93b8a675-1cc9-4788-a38b-a70e8ec09468
+
+	measure 'Cum Order budget Plan' =
+			
+			CALCULATE(
+			    [Order Budget Plan],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    )
+			)
+		formatString: 0.0
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: 754f2f64-2090-4207-961c-bb84a38c8231
+
+	measure 'Actuals & Forecast Values' = IF([Orders]=BLANK(),[Current Wk Forecast],[Orders])
+		formatString: 0.0
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: 848875ef-e71b-4219-86a7-5385ebf7f7dd
+
+	measure 'Check Cal_test' = ```
+			
+			SWITCH(TRUE(),
+			
+			MAX(TableNew[Column1])="Net Orders" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Orders],
+			MAX(TableNew[Column1])="Net Orders" && MAX(ColWkSorting[WKDyn]) <>"CurrWeek-1",BLANK(),
+			MAX(TableNew[Column1])="Monthly Plan" &&MAX(ColWkSorting[WKDyn])="CurrWeek-1",[M1M2M3],
+			MAX(TableNew[Column1])="Monthly Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK(),
+			MAX(TableNew[Column1])="vs Monthly Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[vs QTD M2 Plan],
+			MAX(TableNew[Column1])="vs Monthly Plan" && MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK(),
+			MAX(TableNew[Column1])="vs Budget Plan"&&  MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Order Budget Plan],
+			MAX(TableNew[Column1])="vs Budget Plan"&&  MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK(),
+			MAX(TableNew[Column1])="Performance"&&   MAX(ColWkSorting[WKDyn])="CurrWeek-1",[performance],
+			MAX(TableNew[Column1])="Performance"&&  MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",
+			BLANK())
+			
+			
+			```
+		formatString: 0.0
+		lineageTag: acf6d301-5a5d-4b69-9a6b-8443b291b8e8
+
+	measure 'orders_test for current' = IF([Orders]= BLANK(),CALCULATE([Orders],ColWkSorting[WKDyn]="CurrWeek-1"),[Orders])
+		lineageTag: 87e24985-5771-49b2-92ef-afdb85399525
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Actuals_CK&PW = IF(VALUES('rpt dim_current_date_rof'[Actualsavaialble])="Y",[Orders],CALCULATE([Orders], ColWkSorting[WKDyn]="CurrWeek-1"))
+		displayFolder: "vs" Measures
+		lineageTag: 885808d4-b9a2-4b82-8ae9-6d3ff990f674
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Monthly Plan' = CALCULATE([M1M2M3],ColWkSorting[Weeksdyn]="CurrWeek")
+		lineageTag: c351d62d-9465-4910-b42d-b3b14add21ef
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Order_Budget_Plan = CALCULATE([Order Budget Plan],ColWkSorting[Weeksdyn]="CurrWeek")
+		displayFolder: Target Measures
+		lineageTag: e8d6fce3-a8aa-4251-833b-a444a1ae6893
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'QTD M2 Plan_Test' = [Actuals_CK&PW]-[Monthly Plan]
+		displayFolder: "vs" Measures
+		lineageTag: cbebe5e6-1608-4a0b-adf1-ed38d43dc605
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'vs Budget Plan' = CALCULATE([Order Budget Plan],ColWkSorting[Weeksdyn]="CurrWeek")
+		formatString: 0.0
+		displayFolder: Target Measures
+		lineageTag: f223f369-d64b-4670-a776-7f2023a1e801
+
+	measure 'check call_OL' =
+			SWITCH(TRUE(),
+			MAX(Table_OL[Column1])="Actuals" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Cum Orders],
+			MAX(Table_OL[Column1])="Actuals" && MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK(),
+			MAX(Table_OL[Column1])="M1 Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M1",[SC_CUM_Month_OL],
+			MAX(Table_OL[Column1])="M1 Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M1",BLANK(),
+			MAX(Table_OL[Column1])="M2 Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M2",[SC_CUM_Month_OL],
+			MAX(Table_OL[Column1])="M2 Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M2",BLANK(),
+			MAX(Table_OL[Column1])="M3 Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M3",[SC_CUM_Month_OL],
+			MAX(Table_OL[Column1])="M3 Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M3",BLANK())
+		formatString: 0.0
+		lineageTag: 00276454-44ee-43ea-980b-048cc5264eee
+
+	measure 'Check Cal_Geo' = ```
+			
+			
+			SWITCH(TRUE(),
+			
+			MAX(TableNew[Column1])="Net Orders" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Cum Orders],
+			MAX(TableNew[Column1])="Net Orders" && MAX(ColWkSorting[WKDyn]) <>"CurrWeek-1",BLANK(),
+			MAX(TableNew[Column1])="M1 Plan" &&MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M1"  ,[SC_CUM_Month_OL],
+			MAX(TableNew[Column1])="M1 Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M1",BLANK(),
+			MAX(TableNew[Column1])="M2 Plan" &&MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M2"  ,[SC_CUM_Month_OL],
+			MAX(TableNew[Column1])="M2 Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M2",BLANK(),
+			MAX(TableNew[Column1])="M3 Plan" &&MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M3"  ,[SC_CUM_Month_OL],
+			MAX(TableNew[Column1])="M3 Plan" &&MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M3",BLANK(),
+			MAX(TableNew[Column1])="vs M1 Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M1",[vs QTD M2 Plan],
+			MAX(TableNew[Column1])="vs M1 Plan" && MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M1",BLANK(),
+			MAX(TableNew[Column1])="vs M2 Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M2",[vs QTD M2 Plan],
+			MAX(TableNew[Column1])="vs M2 Plan" && MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M2",BLANK(),
+			MAX(TableNew[Column1])="vs M3 Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M3",[vs QTD M2 Plan],
+			MAX(TableNew[Column1])="vs M3 Plan" && MAX(ColWkSorting[WKDyn])<>"CurrWeek-1" && SELECTEDVALUE('Month Selection'[Month])="M3",BLANK(),
+			MAX(TableNew[Column1])="vs Budget Plan"&&  MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Cum Order budget Plan],
+			MAX(TableNew[Column1])="vs Budget Plan"&&  MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK(),
+			MAX(TableNew[Column1])="Performance"&&   MAX(ColWkSorting[WKDyn])="CurrWeek-1",[performance],
+			MAX(TableNew[Column1])="Performance"&&  MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",
+			BLANK())
+			
+			
+			```
+		formatString: 0.0
+		lineageTag: 3e441bc1-53f6-4a21-8017-4fbb5041c287
+
+	measure Column_colors = ```
+			IF(MAX(Table_OL[Column1])="Actuals",1,2)
+			
+			
+			```
+		formatString: 0
+		displayFolder: "vs" Measures
+		lineageTag: 92f44fd4-466e-4953-924c-2ba3693869ff
+
+	measure checkcall_OL_Budget =
+			SWITCH(TRUE(),
+			MAX(Table_OL[Column1])="Actuals" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Cum Orders],
+			MAX(Table_OL[Column1])="Actuals" && MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK(),
+			MAX(Table_OL[Column1])="Budget Plan" && MAX(ColWkSorting[WKDyn])="CurrWeek-1",[Cum Order budget Plan],
+			MAX(Table_OL[Column1])="Budget Plan" && MAX(ColWkSorting[WKDyn])<>"CurrWeek-1",BLANK())
+		formatString: 0.0
+		lineageTag: d154e920-720c-41fc-9f3b-42ca1845fe14
+
+	measure Actuals_OL = IF([Orders]= [Blank],[Blank],[Orders])
+		formatString: 0.0
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: 7fa69f25-5d19-498b-9d0d-6e5aec82b741
+
+	measure 'Current Wk Forecast_OL' =
+			
+			
+			CALCULATE(
+			    [Forecast Value],
+			       KEEPFILTERS(RowWkSorting[IsCurrentWeek] = "TRUE"),
+			    KEEPFILTERS(MAX(RowWkSorting[SortOrder])>(RowWkSorting[SortOrder])
+			)
+			
+			)
+		lineageTag: 26f583ea-2ca1-4332-9961-b3712a4b6099
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure CurrentWk_Forecast_OL = IF([Orders]=BLANK(),[Current Wk Forecast],BLANK())
+		formatString: 0.0
+		lineageTag: 87686e86-b54a-45ad-b007-10ffd1c5a42f
+
+	measure CurrentWk_Forecast_OL_Test = IF([Orders]=[Current Wk Forecast],BLANK(),[Current Wk Forecast])
+		formatString: 0.0
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: 6f14f2e1-534e-45db-9054-a6f172f818f4
+
+	measure 'Dynamic Title' = "vs Plan " & SELECTEDVALUE('Month Selection'[Month])
+		lineageTag: ba551fbd-96d9-4a98-9f66-8b9859638fb4
+
+	measure 'Dynamic Title1' = "vs Plan " & SELECTEDVALUE('Month Selection'[Month]) & " Cum"
+		lineageTag: 52c1ab10-7eaa-44ee-bab8-320c0c360334
+
+	measure SC_Month_OL = ```
+			
+			VAR MonSel = SELECTEDVALUE('Month Selection'[Month])
+			VAR Result = 
+			            SWITCH(TRUE(),
+			            MonSel="M1",[Plan + Task_M1],
+			            MonSel="M2",[Plan + Task_M2],
+			            MonSel="M3",[Plan + Task_M3])
+			
+			Return
+			Result
+			
+			```
+		lineageTag: 1edc78eb-ded4-4935-adcc-64beb2191a19
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure SC_CUM_Month_OL = ```
+			
+			CALCULATE(
+			    [SC_Month_OL],
+			    FILTER(
+			        ALL(ColWkSorting),
+			        ColWkSorting[SortOrder] <= MAX(ColWkSorting[SortOrder])
+			    
+			)
+			)
+			```
+		lineageTag: eba7e372-bef9-4b3a-8409-f8ad81855585
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Dynamic Title_OL' = ```
+			SELECTEDVALUE('Month Selection'[Month]) & " Plan " 
+			```
+		lineageTag: e1e6e8e3-989b-4514-afef-db97bdc9f2b9
+
+	measure GEO_title = ```
+			"QTD PERFORMANCE VS " & SELECTEDVALUE('Month Selection'[Month]) &" PLAN" 
+			```
+		lineageTag: 867d63dc-d97f-4b76-8941-ac7518528fae
+
+	measure check_test1 =
+			SWITCH(TRUE(),
+			
+			MAX('Metric Table'[Column1])="PQ Orders",[Cum orders_pq],
+			
+			MAX('Metric Table'[Column1])="M1 Plan" && SELECTEDVALUE('Month Selection'[Month])="M1"  ,[SC_CUM_Month_OL],
+			MAX('Metric Table'[Column1])="M2 Plan" && SELECTEDVALUE('Month Selection'[Month])="M2"  ,[SC_CUM_Month_OL],
+			MAX('Metric Table'[Column1])="M3 Plan" && SELECTEDVALUE('Month Selection'[Month])="M3"  ,[SC_CUM_Month_OL],
+			MAX('Metric Table'[Column1])="QTD Orders"  ,[Cum Orders],
+			MAX('Metric Table'[Column1])="Budget Plan"  ,[Cum Order budget Plan],
+			
+			BLANK())
+		lineageTag: 7af1f00a-c938-4044-9a7e-a71248088bbd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Actuals vs PW_Test' = ```
+			
+			VAR DisplayValue =
+			[VS Prior Wk Fcst_New]
+			Var Result = if([Sel Decimal]= "w decimal",CONVERT(DisplayValue,DOUBLE),
+			    if([Sel Decimal]= "no decimal",FORMAT(IF(DisplayValue=BLANK(),0,DisplayValue),"#,0")))
+			Return
+			Result
+			
+			
+			```
+		displayFolder: Actuals & Forecast Measures
+		lineageTag: 82721ee7-d007-4324-8bba-4a661ba60774
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column1
+		dataType: string
+		lineageTag: 27c1ed25-26db-454b-a3a0-75e603d3fada
+		summarizeBy: none
+		sourceColumn: Column1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calcs-a41ea9d6-0c34-49a0-890b-54a2b10428ed = m
+		mode: import
+		queryGroup: 'ROF Group'
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

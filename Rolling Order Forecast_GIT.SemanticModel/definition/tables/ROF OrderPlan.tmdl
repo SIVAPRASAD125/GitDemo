@@ -1,0 +1,100 @@
+table 'ROF OrderPlan'
+	lineageTag: e758b9f1-bd70-4817-871c-c2e107ec9cde
+
+	column fiscalQuarter
+		dataType: string
+		lineageTag: 55160050-b8af-441e-9ffb-7722922006f0
+		summarizeBy: none
+		sourceColumn: fiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: d054ddb0-8d09-45f0-add8-2b6f3da11639
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geography
+		dataType: string
+		lineageTag: 767e216e-f81b-4a30-a9ed-cbb8da819223
+		summarizeBy: none
+		sourceColumn: Geography
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		dataType: string
+		lineageTag: a2cbe9d2-72f2-4c04-9b0d-d10949e518ed
+		summarizeBy: none
+		sourceColumn: WeekNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderPlanValue
+		dataType: double
+		lineageTag: 28a83a6e-0d54-4347-b6c0-90d1a2988fca
+		summarizeBy: sum
+		sourceColumn: OrderPlanValue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Status
+		dataType: string
+		lineageTag: 06cfc470-ab03-482e-870e-c339f57e5658
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geo
+		dataType: string
+		lineageTag: ec6eb20e-6599-427f-b772-670fe77058c6
+		summarizeBy: none
+		sourceColumn: Geo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Plan
+		dataType: string
+		lineageTag: 373af0f6-18a3-4cc2-923c-4379e25dca6c
+		summarizeBy: none
+		sourceColumn: Plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoKey
+		dataType: string
+		lineageTag: f527bd3b-b160-4871-a03f-b8965b410f4b
+		summarizeBy: none
+		sourceColumn: GeoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		lineageTag: 7be5cdd2-d84e-447d-a5e8-af4663ca2aac
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'ROF OrderPlan-3067cae7-b374-452b-8d2a-08cc58a89989' = m
+		mode: import
+		queryGroup: 'ROF Group\Facts'
+		source =
+				let
+				    Source = Sql.Database("sqldb0050prd.americas.hpqcorp.net,1190", "Sales_Cockpit"),
+				    #"fact ROF_Forecast_Sheet" = Source{[Schema="fact",Item="ROF_OrderPlan"]}[Data],
+				    #"Removed Other Columns" = Table.SelectColumns(#"fact ROF_Forecast_Sheet",{"fiscalQuarter", "Region", "Geography", "BU", "WeekNo", "OrderPlanValue", "Status", "Geo", "Plan", "GeoKey", "ProductKey", "BusinessAreaCode"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Other Columns",{{"fiscalQuarter", type text}, {"Region", type text}, {"Geography", type text}, {"BU", type text}, {"WeekNo", type text}, {"OrderPlanValue", type number}, {"Status", type text}, {"Geo", type text}, {"Plan", type text}, {"GeoKey", type text}, {"ProductKey", type text}, {"BusinessAreaCode", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"BusinessAreaCode", "BU"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Exception
+
